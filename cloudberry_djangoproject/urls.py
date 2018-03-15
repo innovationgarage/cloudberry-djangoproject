@@ -1,4 +1,4 @@
-"""extendnetjson_project URL Configuration
+"""cloudberry_djangoproject URL Configuration
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/2.0/topics/http/urls/
@@ -22,8 +22,8 @@ urlpatterns = [
     # extendnetjson: Urls to your extension app and its controller The
     # controller is the set of views used by devices to download
     # configuration    
-    url(r'^', include('extendnetjson_app.controller.urls', namespace='controller')),
-    url(r'^', include('extendnetjson_app.urls', namespace='netjsonconfig')),
+    url(r'^', include('cloudberry_app.controller.urls', namespace='controller')),
+    url(r'^', include('cloudberry_app.urls', namespace='netjsonconfig')),
     url(r'^', include('django_x509.urls', namespace='x509')),
 ]
 

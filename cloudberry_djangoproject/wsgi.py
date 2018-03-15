@@ -1,5 +1,5 @@
 """
-WSGI config for extendnetjson_project project.
+WSGI config for cloudberry_djangoproject project.
 
 It exposes the WSGI callable as a module-level variable named ``application``.
 
@@ -11,6 +11,6 @@ import os
 
 from django.core.wsgi import get_wsgi_application
 
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "extendnetjson_project.settings")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "cloudberry_djangoproject.settings")
 
 application = get_wsgi_application()

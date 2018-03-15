@@ -12,16 +12,16 @@ from django.utils.translation import ugettext_lazy as _
 class Config(TemplatesVpnMixin, AbstractConfig):
     class Meta(AbstractConfig.Meta):
         abstract = False
-    device = models.OneToOneField('extendnetjson_app.Device', on_delete=models.CASCADE)
-    templates = SortedManyToManyField('extendnetjson_app.Template',
+    device = models.OneToOneField('cloudberry_app.Device', on_delete=models.CASCADE)
+    templates = SortedManyToManyField('cloudberry_app.Template',
                                       related_name='config_relations',
                                       verbose_name=_('templates'),
                                       base_class=TemplatesThrough,
                                       blank=True,
                                       help_text=_('configuration templates, applied from '
                                                   'first to last'))
-    vpn = models.ManyToManyField('extendnetjson_app.Vpn',
-                                 through='extendnetjson_app.VpnClient',
+    vpn = models.ManyToManyField('cloudberry_app.Vpn',
+                                 through='cloudberry_app.VpnClient',
                                  related_name='vpn_relations',
                                  blank=True)
 
@@ -34,18 +34,18 @@ class TemplateTag(AbstractTemplateTag):
         abstract = False
 
 class TaggedTemplate(AbstractTaggedTemplate):
-    tag = models.ForeignKey('extendnetjson_app.TemplateTag',
+    tag = models.ForeignKey('cloudberry_app.TemplateTag',
                             related_name='%(app_label)s_%(class)s_items',
                             on_delete=models.CASCADE)
     class Meta(AbstractTaggedTemplate.Meta):
         abstract = False
 
 class Template(AbstractTemplate):
-    tags = TaggableManager(through='extendnetjson_app.TaggedTemplate', blank=True,
+    tags = TaggableManager(through='cloudberry_app.TaggedTemplate', blank=True,
                            help_text=_('A comma-separated list of template tags, may be used '
                                        'to ease auto configuration with specific settings (eg: '
                                        '4G, mesh, WDS, VPN, ecc.)'))
-    vpn = models.ForeignKey('extendnetjson_app.Vpn',
+    vpn = models.ForeignKey('cloudberry_app.Vpn',
                             verbose_name=_('VPN'),
                             blank=True,
                             null=True,
@@ -54,9 +54,9 @@ class Template(AbstractTemplate):
         abstract = False
 
 class VpnClient(AbstractVpnClient):
-    config = models.ForeignKey('extendnetjson_app.Config',
+    config = models.ForeignKey('cloudberry_app.Config',
                                on_delete=models.CASCADE)
-    vpn = models.ForeignKey('extendnetjson_app.Vpn',
+    vpn = models.ForeignKey('cloudberry_app.Vpn',
                             on_delete=models.CASCADE)
     cert = models.OneToOneField('django_x509.Cert',
                                 on_delete=models.CASCADE,
