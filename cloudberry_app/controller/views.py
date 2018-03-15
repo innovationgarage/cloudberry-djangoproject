@@ -7,17 +7,16 @@ from django_netjsonconfig.controller.generics import (
 )
 
 class ChecksumView(BaseChecksumView):
-    model = Config
+    model = Device
 
 class DownloadConfigView(BaseDownloadConfigView):
-    model = Config
+    model = Device
 
 class ReportStatusView(BaseReportStatusView):
-    model = Config
-
+    model = Device
 
 class RegisterView(BaseRegisterView):
-    model = Config
+    model = Device
 
 checksum = ChecksumView.as_view()
 download_config = DownloadConfigView.as_view()

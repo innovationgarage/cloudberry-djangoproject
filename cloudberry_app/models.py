@@ -1,3 +1,4 @@
+from django_netjsonconfig.base.base import BaseModel
 from django_netjsonconfig.base.config import AbstractConfig, TemplatesVpnMixin, TemplatesThrough
 from django_netjsonconfig.base.device import AbstractDevice
 from django_netjsonconfig.base.tag import AbstractTaggedTemplate, AbstractTemplateTag
@@ -7,11 +8,60 @@ from sortedm2m.fields import SortedManyToManyField
 from django.db import models
 from taggit.managers import TaggableManager
 from django.utils.translation import ugettext_lazy as _
+from django.utils.functional import cached_property
+import cloudberry_app.backends
+import django_netjsonconfig.settings as app_settings
+from jsonfield import JSONField
+import collections
+from django.utils.functional import lazy
+from django.utils.module_loading import import_string
 
+class Backend(BaseModel):
+    def get_backends(*arg, **kw):
+        for item in app_settings.BACKENDS:
+            yield item
+        try:
+            Backend
+        except:
+            return
+        for backend in Backend.objects.all():
+            yield ("dynamic://%s" % backend.id, backend.name)
+    backend = models.CharField(_('backend'),
+                               choices=get_backends(),
+                               blank=True,
+                               max_length=128,
+                               help_text=_('Select <a href="http://netjsonconfig.openwisp.org/en/'
+                                           'stable/" target="_blank">netjsonconfig</a> backend'))
+    schema = JSONField(_('schema'),
+                       default=dict,
+                       blank=True,
+                       help_text=_('JSONSchema for the configuration'),
+                       load_kwargs={'object_pairs_hook': collections.OrderedDict},
+                       dump_kwargs={'indent': 4})
+    transform = JSONField(_('transform'),
+                       default=dict,
+                       blank=True,
+                       help_text=_('<a href="https://github.com/dvdln/jsonpath-object-transform">jsonpath-object-transform</a>'
+                                   'to transform the schema to that of the back-end and/or template'),
+                       load_kwargs={'object_pairs_hook': collections.OrderedDict},
+                       dump_kwargs={'indent': 4})
 
+    @cached_property
+    def backend_class(self):
+        if self.backend.startswith("dynamic://"):
+            return cloudberry_app.backends.TemplatedBackend
+        else:
+            return import_string(self.backend)
+    
 class Config(TemplatesVpnMixin, AbstractConfig):
     class Meta(AbstractConfig.Meta):
         abstract = False
+
+    # def __init__(self,  *args, **kwargs):
+    #     super(Config, self).__init__(*args, **kwargs)
+    #     self._meta.get_field('backend').choices = self.get_backends()
+    #     self._meta.get_field('backend').get_choices = self.get_backends
+        
     device = models.OneToOneField('cloudberry_app.Device', on_delete=models.CASCADE)
     templates = SortedManyToManyField('cloudberry_app.Template',
                                       related_name='config_relations',
@@ -24,6 +74,29 @@ class Config(TemplatesVpnMixin, AbstractConfig):
                                  through='cloudberry_app.VpnClient',
                                  related_name='vpn_relations',
                                  blank=True)
+    def get_backends(*arg, **kw):
+        for item in app_settings.BACKENDS:
+            yield item
+        for backend in Backend.objects.all():
+            yield ("dynamic://%s" % backend.id, backend.name)
+    backend = models.CharField(_('backend'),
+                               choices=get_backends(),
+                               blank=True,
+                               max_length=128,
+                               help_text=_('Select <a href="http://netjsonconfig.openwisp.org/en/'
+                                           'stable/" target="_blank">netjsonconfig</a> backend'))
+
+    @cached_property
+    def backend_class(self):
+        if self.backend.startswith("dynamic://"):
+            return cloudberry_app.backends.TemplatedBackend
+        else:
+            return import_string(self.backend)
+
+    def get_backend_instance(self, template_instances=None):
+        inst = AbstractConfig.get_backend_instance(self, template_instances)
+        inst.config_instance = self
+        return inst
 
 class Device(AbstractDevice):
     class Meta(AbstractDevice.Meta):

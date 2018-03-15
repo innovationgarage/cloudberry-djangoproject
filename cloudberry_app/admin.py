@@ -43,6 +43,7 @@ class DeviceAdmin(AbstractDeviceAdmin):
     inlines = [ConfigInline]
 
 
+admin.site.register(Backend)
 admin.site.register(Device, DeviceAdmin)
 admin.site.register(Template, TemplateAdmin)
 admin.site.register(Vpn, VpnAdmin)
