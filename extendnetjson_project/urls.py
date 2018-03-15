@@ -15,7 +15,20 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from django.conf.urls import include, url
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # extendnetjson: Urls to your extension app and its controller The
+    # controller is the set of views used by devices to download
+    # configuration    
+    url(r'^', include('extendnetjson_app.controller.urls', namespace='controller')),
+    url(r'^', include('extendnetjson_app.urls', namespace='netjsonconfig')),
+    url(r'^', include('django_x509.urls', namespace='x509')),
 ]
+
+# extendnetjson: django_netjsonconfig requires staticfiles to
+# function, as the admin interface uses custom javascript for the
+# schema-based json editor.
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+urlpatterns += staticfiles_urlpatterns()

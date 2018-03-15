@@ -20,7 +20,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'kqpgb=j*&awc$0%e!24q)98+^__9g^31_^ltmtc@3_6^4dr^q2'
+SECRET_KEY = 'qgpmkoirf#l9z$+x4fgt8&v02qyt0vnt%d1!z39v2241ouoc=g'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -31,12 +31,25 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    # extendnetjson: Dependency for django_netjsonconfig that needs to
+    # be before 'admin'
+    'openwisp_utils.admin_theme',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    # extendnetjson: Dependencies for django_netjsonconfig
+    'sortedm2m',
+    'reversion',
+    # extendnetjson: This app could be extended the same way as
+    # django_netjsonconfig. This has however not been done in this
+    # project.
+    'django_x509',
+    # extendnetjson: Include your extension app here, not
+    # django_netjsonconfig itself
+    'extendnetjson_app',
 ]
 
 MIDDLEWARE = [
@@ -118,3 +131,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
 
 STATIC_URL = '/static/'
+
+# extendnetjson: We need to include the static files from
+# django_netjsonconfig manually, as django_netjsonconfig is not in
+# INSTALLED_APPS
+import imp
+STATICFILES_DIRS = [os.path.join(imp.find_module("django_netjsonconfig")[1], 'static')]
