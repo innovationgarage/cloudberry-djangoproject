@@ -1,3 +1,7 @@
-from django.shortcuts import render
+from django.views.decorators.http import last_modified
+from django_netjsonconfig.views import *
+import django_netjsonconfig.views
 
-# Create your views here.
+@last_modified(lambda request: start_time)
+def schema(request):
+    return django_netjsonconfig.views.schema(request)
