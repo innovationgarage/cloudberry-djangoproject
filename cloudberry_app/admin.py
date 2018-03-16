@@ -1,5 +1,7 @@
 from django.contrib import admin
 from .models import *
+from .widget import JsonSchemaWidget
+import json
 
 from django_netjsonconfig.base.admin import (AbstractConfigForm,
                                              AbstractConfigInline,
@@ -7,27 +9,23 @@ from django_netjsonconfig.base.admin import (AbstractConfigForm,
                                              AbstractTemplateAdmin,
                                              AbstractVpnAdmin,
                                              AbstractVpnForm,
-                                             BaseForm)
-
+                                             BaseForm,
+                                             BaseAdmin)
 
 class ConfigForm(AbstractConfigForm):
     class Meta(AbstractConfigForm.Meta):
         model = Config
 
-
 class TemplateForm(BaseForm):
     class Meta(BaseForm.Meta):
         model = Template
 
-
 class TemplateAdmin(AbstractTemplateAdmin):
     form = TemplateForm
-
 
 class VpnForm(AbstractVpnForm):
     class Meta(AbstractVpnForm.Meta):
         model = Vpn
-
 
 class VpnAdmin(AbstractVpnAdmin):
     form = VpnForm
@@ -38,12 +36,25 @@ class ConfigInline(AbstractConfigInline):
     form = ConfigForm
     extra = 0
 
-
 class DeviceAdmin(AbstractDeviceAdmin):
     inlines = [ConfigInline]
 
+class BackendForm(BaseForm):
+    class Meta(BaseForm.Meta):
+        model = Backend
+        exclude = []
+        widgets = {'schema': JsonSchemaWidget(attrs={'data-schema': 'meta://',
+                                                     'data-options': json.dumps({
+                                                         "disable_collapse": False,
+                                                         "disable_edit_json": False,
+                                                         "display_required_only": True
+                                                     })})}
 
-admin.site.register(Backend)
+class BackendAdmin(BaseAdmin):
+    model = Backend
+    form = BackendForm
+
+admin.site.register(Backend, BackendAdmin)
 admin.site.register(Device, DeviceAdmin)
 admin.site.register(Template, TemplateAdmin)
 admin.site.register(Vpn, VpnAdmin)
