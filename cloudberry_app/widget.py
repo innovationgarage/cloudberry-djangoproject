@@ -27,14 +27,12 @@ class JsonSchemaWidget(AdminTextareaWidget):
         attrs['class'] = 'vLargeTextField jsoneditor-raw'
         html = """
 <input class="button json-editor-btn-edit advanced-mode" type="button" value="{0}">
-<script>django._netjsonconfigSchemaUrl = "{1}";</script>
 <label id="netjsonconfig-hint">
     Want learn to use the advanced mode? Consult the
     <a href="http://netjsonconfig.openwisp.org/en/stable/general/basics.html"
        target="_blank">netjsonconfig documentation</a>.
 </label>
 """
-        html = html.format(_('Advanced mode (raw JSON)'),
-                           reverse('netjsonconfig:schema'))
+        html = html.format(_('Advanced mode (raw JSON)'),)
         html += super(JsonSchemaWidget, self).render(name, value, attrs)
         return html

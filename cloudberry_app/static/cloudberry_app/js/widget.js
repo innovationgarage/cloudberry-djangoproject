@@ -50,10 +50,10 @@
         };
 
         var editor = new JSONEditor(document.getElementById(advanced.attr('id')), options, data);
-        editor.aceEditor.setOptions({
-            fontSize: 14,
-            showInvisibles: true
-        });
+        // editor.aceEditor.setOptions({
+        //     fontSize: 14,
+        //     showInvisibles: true
+        // });
         // remove powered by ace link
         advanced.find('.jsoneditor-menu a').remove();
         // add  listener to .screen-mode button for toggleScreenMode
@@ -83,7 +83,7 @@
         alert("The JSON entered is not valid");
     };
 
-    var loadUi = function(el, backend, schemas, setInitialValue){
+    var loadUi = function(el, schema, setInitialValue){
         var field = $(el),
             form = field.parents('form').eq(0),
             value = JSON.parse(field.val()),
@@ -122,8 +122,7 @@
             startval: startval,
             keep_oneof_values: false,
             show_errors: 'change',
-            // if no backend selected use empty schema
-            schema: backend ? schemas[backend] : {}
+            schema: schema
         };
         if (field.attr("data-options") !== undefined) {
           $.extend(options, JSON.parse(field.attr("data-options")));
@@ -139,7 +138,7 @@
             field.val(getEditorValue());
         };
 
-        editor.editors.root.addproperty_button.value = 'Configuration Menu';
+        editor.editors.root.getButton().value = 'Configuration Menu';
         // set initial field value to the schema default
         if (setInitialValue) {
             initialField.val(getEditorValue());
@@ -207,27 +206,35 @@
         });
     };
 
-    var bindLoadUi = function(){
-        $.getJSON(django._netjsonconfigSchemaUrl).success(function(schemas){
-            $('.jsoneditor-raw').each(function(i, el){
-                var field = $(el),
-                    schema = field.attr("data-schema"),
-                    schema_selector = field.attr("data-schema-selector");
-                if (schema !== undefined) {
-                    loadUi(el, schema, schemas, true);
-                } else {
-                    if(schema_selector === undefined) {
-                        schema_selector = '#id_backend, #id_config-0-backend';
-                    }
-                    var backend = $(schema_selector);
-                    // load first time
-                    loadUi(el, backend.val(), schemas, true);
-                    // reload when backend is changed
-                    backend.change(function(){
-                        loadUi(el, backend.val(), schemas);
-                    });
-                }
+    var loadUiAndSchema = function(el, schema, setInitialValue){
+        if (!schema) {
+            loadUi(el, {}, setInitialValue);
+        } else {
+            $.getJSON(schema).success(function(schema){
+                loadUi(el, schema, setInitialValue);
             });
+        }
+    };
+
+    var bindLoadUi = function(){
+        $('.jsoneditor-raw').each(function(i, el){
+            var field = $(el),
+                schema = field.attr("data-schema"),
+                schema_selector = field.attr("data-schema-selector");
+            if (schema !== undefined) {
+                loadUi(el, schema, true);
+            } else {
+                if(schema_selector === undefined) {
+                    schema_selector = '#id_backend, #id_config-0-backend';
+                }
+                var backend = $(schema_selector);
+                // load first time
+                loadUiAndSchema(el, backend.val(), true);
+                // reload when backend is changed
+                backend.change(function(){
+                    loadUiAndSchema(el, backend.val());
+                });
+            }
         });
     };
 

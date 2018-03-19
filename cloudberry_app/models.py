@@ -19,13 +19,13 @@ from django.utils.module_loading import import_string
 class Backend(BaseModel):
     def get_backends(*arg, **kw):
         for item in app_settings.BACKENDS:
-            yield item
+            yield ("/cloudberry_app/schema/backend/%s" % item[0], item[1])
         try:
             Backend
         except:
             return
         for backend in Backend.objects.all():
-            yield ("dynamic://%s" % backend.id, backend.name)
+            yield ("/cloudberry_app/schema/dynamic/%s" % backend.id, backend.name)
     backend = models.CharField(_('backend'),
                                choices=get_backends(),
                                blank=True,
@@ -48,10 +48,10 @@ class Backend(BaseModel):
 
     @cached_property
     def backend_class(self):
-        if self.backend.startswith("dynamic://"):
+        if self.backend.startswith("/cloudberry_app/schema/dynamic/"):
             return cloudberry_app.backends.TemplatedBackend
-        else:
-            return import_string(self.backend)
+        elif self.backend.startswith("/cloudberry_app/schema/backend/"):
+            return import_string(self.backend[len("/cloudberry_app/schema/backend/"):])
     
 class Config(TemplatesVpnMixin, AbstractConfig):
     class Meta(AbstractConfig.Meta):
@@ -76,9 +76,9 @@ class Config(TemplatesVpnMixin, AbstractConfig):
                                  blank=True)
     def get_backends(*arg, **kw):
         for item in app_settings.BACKENDS:
-            yield item
+            yield ("/cloudberry_app/schema/backend/%s" % item[0], item[1])
         for backend in Backend.objects.all():
-            yield ("dynamic://%s" % backend.id, backend.name)
+            yield ("/cloudberry_app/schema/dynamic/%s" % backend.id, backend.name)
     backend = models.CharField(_('backend'),
                                choices=get_backends(),
                                blank=True,
@@ -88,10 +88,10 @@ class Config(TemplatesVpnMixin, AbstractConfig):
 
     @cached_property
     def backend_class(self):
-        if self.backend.startswith("dynamic://"):
+        if self.backend.startswith("/cloudberry_app/schema/dynamic/"):
             return cloudberry_app.backends.TemplatedBackend
-        else:
-            return import_string(self.backend)
+        elif self.backend.startswith("/cloudberry_app/schema/backend/"):
+            return import_string(self.backend[len("/cloudberry_app/schema/backend/"):])
 
     def get_backend_instance(self, template_instances=None):
         inst = AbstractConfig.get_backend_instance(self, template_instances)

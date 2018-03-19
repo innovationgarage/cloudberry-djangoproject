@@ -14,9 +14,9 @@ class TemplatedBackend(BaseBackend):
     @property
     def model(self):
         if self._model is None:
-            assert self.config_instance.backend.startswith("dynamic://")
+            assert self.config_instance.backend.startswith("/cloudberry_app/schema/dynamic/")
             self._model = cloudberry_app.models.Backend.objects.get(
-                id=self.config_instance.backend.split("://")[1])
+                id=self.config_instance.backend[len("/cloudberry_app/schema/dynamic/"):])
         return self._model
    
     @property

@@ -15,6 +15,12 @@ from django_netjsonconfig.base.admin import (AbstractConfigForm,
 class ConfigForm(AbstractConfigForm):
     class Meta(AbstractConfigForm.Meta):
         model = Config
+        widgets = {'config': JsonSchemaWidget(attrs={'data-options': json.dumps({
+                                                         "theme": 'bootstrap2',
+                                                         "disable_collapse": False,
+                                                         "disable_edit_json": False,
+                                                         "display_required_only": True
+                                                     })})}
 
 class TemplateForm(BaseForm):
     class Meta(BaseForm.Meta):
@@ -43,7 +49,7 @@ class BackendForm(BaseForm):
     class Meta(BaseForm.Meta):
         model = Backend
         exclude = []
-        widgets = {'schema': JsonSchemaWidget(attrs={'data-schema': 'meta://',
+        widgets = {'schema': JsonSchemaWidget(attrs={'data-schema': '/cloudberry_app/schema/meta',
                                                      'data-options': json.dumps({
                                                          "theme": 'bootstrap2',
                                                          "disable_collapse": False,
