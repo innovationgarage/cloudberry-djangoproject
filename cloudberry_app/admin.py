@@ -45,6 +45,7 @@ class BackendForm(BaseForm):
         exclude = []
         widgets = {'schema': JsonSchemaWidget(attrs={'data-schema': 'meta://',
                                                      'data-options': json.dumps({
+                                                         "theme": 'bootstrap2',
                                                          "disable_collapse": False,
                                                          "disable_edit_json": False,
                                                          "display_required_only": True

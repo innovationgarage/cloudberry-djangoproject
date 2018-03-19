@@ -38,7 +38,7 @@
         schema = disableSchema ? {} : schema;
         var options = {
             mode:'code',
-            theme: 'ace/theme/tomorrow_night_bright',
+            theme: 'bootstrap2',
             indentation: 4,
             onEditable: function(node){
                 return true;
@@ -49,7 +49,7 @@
             schema: schema
         };
 
-        var editor = new advancedJSONEditor(document.getElementById(advanced.attr('id')), options, data);
+        var editor = new JSONEditor(document.getElementById(advanced.attr('id')), options, data);
         editor.aceEditor.setOptions({
             fontSize: 14,
             showInvisibles: true
