@@ -16,6 +16,7 @@ from django.utils.functional import lazy
 from django.utils.module_loading import import_string
 from model_utils import Choices
 from model_utils.fields import StatusField
+import hashlib
 
 class Backend(BaseModel):
     def get_backends(*arg, **kw):

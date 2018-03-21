@@ -9,6 +9,8 @@ from  django_netjsonconfig.utils import get_object_or_404
 
 class ChecksumView(BaseChecksumView):
     model = Device
+    def get_object(self, *args, **kwargs):
+        return get_object_or_404(self.model, *args, **kwargs)
 
 class DownloadConfigView(BaseDownloadConfigView):
     model = Device
@@ -17,9 +19,13 @@ class DownloadConfigView(BaseDownloadConfigView):
 
 class ReportStatusView(BaseReportStatusView):
     model = Device
+    def get_object(self, *args, **kwargs):
+        return get_object_or_404(self.model, *args, **kwargs)
 
 class RegisterView(BaseRegisterView):
     model = Device
+    def get_object(self, *args, **kwargs):
+        return get_object_or_404(self.model, *args, **kwargs)
 
 checksum = ChecksumView.as_view()
 download_config = DownloadConfigView.as_view()
