@@ -34,7 +34,7 @@ class TemplatedBackend(BaseBackend):
             context=self.context)
         inst.config_instance = self.model
         return inst
-        
+
     def render(self, *arg, **kw):
         return self.get_backend_instance().render(*arg, **kw)
         

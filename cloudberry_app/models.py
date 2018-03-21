@@ -14,6 +14,8 @@ from jsonfield import JSONField
 import collections
 from django.utils.functional import lazy
 from django.utils.module_loading import import_string
+from model_utils import Choices
+from model_utils.fields import StatusField
 
 class Backend(BaseModel):
     def get_backends(*arg, **kw):
@@ -115,6 +117,12 @@ class Config(BaseConfig):
         inst.config_instance = self
         return inst
 
+    def get_lowest_backend_instance(self):
+        obj = self
+        while hasattr(obj, 'get_backend_instance'):
+            obj = obj.get_backend_instance()
+        return obj
+    
     def save(self, *arg, **kw):
         BaseConfig.save(self, *arg, **kw)
 
@@ -124,7 +132,37 @@ class Config(BaseConfig):
             for device in backend.extract_foreign_keys(self.config, 'cloudberry_app.models.Device'):
                 self.devices.add(device)
     
-class Device(AbstractDevice):
+class AbstractDevice2(AbstractDevice):
+    # This whole class is a hack, to be able to override a @property
+    # from AbstractDevice with a django CharField
+    # Not sure why it doesn't work without this intermediate class...
+    backend = None
+    last_ip = None
+    status = None
+    
+    class Meta(AbstractDevice.Meta):
+        abstract = True
+
+class Device(AbstractDevice2):
+    STATUS = Choices('modified', 'running', 'error')
+    status = StatusField(help_text=_(
+        'modified means the configuration is not applied yet; '
+        'running means applied and running; '
+        'error means the configuration caused issues and it was rolledback'
+    ))
+    last_ip = models.GenericIPAddressField(blank=True,
+                                           null=True,
+                                           help_text=_('indicates the last ip from which the '
+                                                       'configuration was downloaded from '
+                                                       '(except downloads from this page)'))
+
+    backend = models.CharField(_('backend'),
+                               choices=[("/cloudberry_app/schema/backend/%s" % item[0], item[1]) for item in app_settings.BACKENDS],
+                               blank=True,
+                               max_length=128,
+                               help_text=_('Select <a href="http://netjsonconfig.openwisp.org/en/'
+                                           'stable/" target="_blank">netjsonconfig</a> backend'))
+
     class Meta(AbstractDevice.Meta):
         abstract = False
 
@@ -132,8 +170,42 @@ class Device(AbstractDevice):
         return ", ".join([c.name for c in self.configs.all()])
     get_config_list.short_description = "Configurations"
 
+
+
+    @cached_property
+    def backend_class(self):
+        return import_string(self.backend.split("/")[-1])
+
+    def get_backend_instance(self):
+        backend = self.backend_class
+        kwargs = {'config': {}}
+        if hasattr(self, 'configs'):
+            configs = self.configs.all()
+            kwargs['templates'] = [c.get_lowest_backend_instance().config for c in configs]
+        if hasattr(self, 'get_context'):
+            kwargs['context'] = self.get_context()
+        return backend(**kwargs)
+    
+    # The controller expects a single config object with the
+    # methods defined below, so we synthesize it...
+
+    def _has_config(self):
+        return False
+
     @property
     def config(self):
-        return self.configs.all()[0]
+        return self
 
-    
+    def generate(self):
+        return self.get_backend_instance().generate()
+
+    @property
+    def checksum(self):
+        config = self.generate().getvalue()
+        return hashlib.md5(config).hexdigest()
+
+    def json(self, dict=False, **kwargs):
+        config = self.get_backend_instance().config
+        if dict:
+            return config
+        return json.dumps(config, **kwargs)

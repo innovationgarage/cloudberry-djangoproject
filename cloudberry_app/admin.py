@@ -44,7 +44,17 @@ class DeviceAdmin(AbstractDeviceAdmin):
     list_filter = ['created']
     list_select_related = ()
     readonly_fields = ['id_hex', 'get_config_list']
-    fields = AbstractDeviceAdmin.fields + ['get_config_list']
+    fields = ['name',
+              'mac_address',
+              'id_hex',
+              'key',
+              'backend',
+              'model',
+              'os',
+              'system',
+              'created',
+              'modified',
+              'get_config_list']
 
 class BackendForm(BaseForm):
     class Meta(BaseForm.Meta):
