@@ -41,3 +41,5 @@ class TemplatedBackend(BaseBackend):
     def generate(self, *arg, **kw):
         return self.get_backend_instance().generate(*arg, **kw)
         
+    def extract_foreign_keys(self, config, model):
+        return self.model.extract_foreign_keys(config, model)

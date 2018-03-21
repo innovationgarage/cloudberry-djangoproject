@@ -2,13 +2,11 @@ from django.contrib import admin
 from .models import *
 from .widget import JsonSchemaWidget
 import json
+from django.utils.translation import ugettext_lazy as _
 
 from django_netjsonconfig.base.admin import (AbstractConfigForm,
                                              AbstractConfigInline,
                                              AbstractDeviceAdmin,
-                                             AbstractTemplateAdmin,
-                                             AbstractVpnAdmin,
-                                             AbstractVpnForm,
                                              BaseForm,
                                              BaseAdmin)
 
@@ -22,55 +20,57 @@ class ConfigForm(AbstractConfigForm):
                                                          "display_required_only": True
                                                      })})}
 
-class TemplateForm(BaseForm):
-    class Meta(BaseForm.Meta):
-        model = Template
 
-class TemplateAdmin(AbstractTemplateAdmin):
-    form = TemplateForm
+class ConfigAdmin(BaseAdmin):
+    verbose_name_plural = _('Device configuration details')
+    readonly_fields = []
+    fields = ['name',
+              'backend',
+              'config',
+              'created',
+              'modified']
+    change_select_related = ()
 
-class VpnForm(AbstractVpnForm):
-    class Meta(AbstractVpnForm.Meta):
-        model = Vpn
-
-class VpnAdmin(AbstractVpnAdmin):
-    form = VpnForm
-
-
-class ConfigInline(AbstractConfigInline):
-    model = Config
+    def get_queryset(self, request):
+        qs = super(ConfigAdmin, self).get_queryset(request)
+        return qs.select_related(*self.change_select_related)
+    
     form = ConfigForm
     extra = 0
-
+    
 class DeviceAdmin(AbstractDeviceAdmin):
-    inlines = [ConfigInline]
+    inlines = []
+    list_display =  AbstractDeviceAdmin.list_display + ['get_config_list']
+    list_filter = ['created']
+    list_select_related = ()
+    readonly_fields = ['id_hex', 'get_config_list']
+    fields = AbstractDeviceAdmin.fields + ['get_config_list']
 
 class BackendForm(BaseForm):
     class Meta(BaseForm.Meta):
         model = Backend
         exclude = []
         widgets = {
-            'schema': JsonSchemaWidget(attrs={'data-schema': '/cloudberry_app/schema/meta',
-                                              'data-options': json.dumps({
-                                                  "theme": 'bootstrap2',
-                                                  "disable_collapse": False,
-                                                  "disable_edit_json": False,
-                                                  "display_required_only": True
-                                              })}),
-            'transform': JsonSchemaWidget(attrs={'data-schema-selector': '#id_backend',
-                                                 'data-options': json.dumps({
-                                                     "theme": 'bootstrap2',
-                                                     "disable_collapse": False,
-                                                     "disable_edit_json": False,
-                                                     "display_required_only": True
-                                                 })})
+            # 'schema': JsonSchemaWidget(attrs={'data-schema': '/cloudberry_app/schema/meta',
+            #                                   'data-options': json.dumps({
+            #                                       "theme": 'bootstrap2',
+            #                                       "disable_collapse": False,
+            #                                       "disable_edit_json": False,
+            #                                       "display_required_only": True
+            #                                   })}),
+            # 'transform': JsonSchemaWidget(attrs={'data-schema-selector': '#id_backend',
+            #                                      'data-options': json.dumps({
+            #                                          "theme": 'bootstrap2',
+            #                                          "disable_collapse": False,
+            #                                          "disable_edit_json": False,
+            #                                          "display_required_only": True
+            #                                      })})
         }
 
 class BackendAdmin(BaseAdmin):
     model = Backend
     form = BackendForm
 
+admin.site.register(Config, ConfigAdmin)
 admin.site.register(Backend, BackendAdmin)
 admin.site.register(Device, DeviceAdmin)
-admin.site.register(Template, TemplateAdmin)
-admin.site.register(Vpn, VpnAdmin)
