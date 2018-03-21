@@ -19,13 +19,13 @@ from django.utils.module_loading import import_string
 class Backend(BaseModel):
     def get_backends(*arg, **kw):
         for item in app_settings.BACKENDS:
-            yield ("/cloudberry_app/schema/backend/%s" % item[0], item[1])
+            yield ("/cloudberry_app/schema/transform/backend/%s" % item[0], item[1])
         try:
             Backend
         except:
             return
         for backend in Backend.objects.all():
-            yield ("/cloudberry_app/schema/dynamic/%s" % backend.id, backend.name)
+            yield ("/cloudberry_app/schema/transform/dynamic/%s" % backend.id, backend.name)
     backend = models.CharField(_('backend'),
                                choices=get_backends(),
                                blank=True,
@@ -48,10 +48,10 @@ class Backend(BaseModel):
 
     @cached_property
     def backend_class(self):
-        if self.backend.startswith("/cloudberry_app/schema/dynamic/"):
+        if self.backend.startswith("/cloudberry_app/schema/transform/dynamic/"):
             return cloudberry_app.backends.TemplatedBackend
-        elif self.backend.startswith("/cloudberry_app/schema/backend/"):
-            return import_string(self.backend[len("/cloudberry_app/schema/backend/"):])
+        elif self.backend.startswith("/cloudberry_app/schema/transform/backend/"):
+            return import_string(self.backend[len("/cloudberry_app/schema/transform/backend/"):])
     
 class Config(TemplatesVpnMixin, AbstractConfig):
     class Meta(AbstractConfig.Meta):

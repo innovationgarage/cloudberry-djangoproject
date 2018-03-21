@@ -49,13 +49,22 @@ class BackendForm(BaseForm):
     class Meta(BaseForm.Meta):
         model = Backend
         exclude = []
-        widgets = {'schema': JsonSchemaWidget(attrs={'data-schema': '/cloudberry_app/schema/meta',
-                                                     'data-options': json.dumps({
-                                                         "theme": 'bootstrap2',
-                                                         "disable_collapse": False,
-                                                         "disable_edit_json": False,
-                                                         "display_required_only": True
-                                                     })})}
+        widgets = {
+            'schema': JsonSchemaWidget(attrs={'data-schema': '/cloudberry_app/schema/meta',
+                                              'data-options': json.dumps({
+                                                  "theme": 'bootstrap2',
+                                                  "disable_collapse": False,
+                                                  "disable_edit_json": False,
+                                                  "display_required_only": True
+                                              })}),
+            'transform': JsonSchemaWidget(attrs={'data-schema-selector': '#id_backend',
+                                                 'data-options': json.dumps({
+                                                     "theme": 'bootstrap2',
+                                                     "disable_collapse": False,
+                                                     "disable_edit_json": False,
+                                                     "display_required_only": True
+                                                 })})
+        }
 
 class BackendAdmin(BaseAdmin):
     model = Backend
