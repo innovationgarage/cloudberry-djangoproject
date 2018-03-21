@@ -34,7 +34,7 @@ def schema_backend(request, schema):
 @check_auth
 def schema_dynamic(request, schema):
     try:
-        c = cloudberry_app.models.Backend.objects.get(id=schema).schema
+        c = cloudberry_app.models.Backend.objects.get(id=schema).extended_schema
         status = 200
     except:
         c = {"error": "Not found"}
@@ -60,7 +60,7 @@ def schema_transform_backend(request, schema):
 def schema_transform_dynamic(request, schema):
     try:
         c = jpot.schema_transform(
-            cloudberry_app.models.Backend.objects.get(id=schema).schema)
+            cloudberry_app.models.Backend.objects.get(id=schema).extended_schema)
         status = 200
     except:
         c = {"error": "Not found"}

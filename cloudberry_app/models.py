@@ -52,7 +52,26 @@ class Backend(BaseModel):
             return cloudberry_app.backends.TemplatedBackend
         elif self.backend.startswith("/cloudberry_app/schema/transform/backend/"):
             return import_string(self.backend[len("/cloudberry_app/schema/transform/backend/"):])
-    
+
+   
+    def _schema_add_foreign_keys(self, schema):
+        schema = dict(schema)
+        if 'definitions' not in schema:
+            schema['definitions'] = {}
+        devices = Device.objects.all().order_by('name')
+        schema['definitions']['foreign_key__device'] = {
+            'title': 'Device',
+            'type': 'object',
+            'options': {'enum_titles': [device.name for device in devices]},
+            'enum': [{'model': 'cloudberry_app.models.Device', 'id': str(devices.id)}
+                     for devices in devices]
+        }
+        return schema
+
+    @property
+    def extended_schema(self):
+        return self._schema_add_foreign_keys(self.schema)
+        
 class Config(TemplatesVpnMixin, AbstractConfig):
     class Meta(AbstractConfig.Meta):
         abstract = False
