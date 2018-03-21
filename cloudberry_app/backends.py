@@ -14,14 +14,15 @@ class TemplatedBackend(BaseBackend):
     @property
     def model(self):
         if self._model is None:
-            assert self.config_instance.backend.startswith("/cloudberry_app/schema/transform/dynamic/")
+            assert (self.config_instance.backend.startswith("/cloudberry_app/schema/dynamic/")
+                    or self.config_instance.backend.startswith("/cloudberry_app/schema/transform/dynamic/"))
             self._model = cloudberry_app.models.Backend.objects.get(
-                id=self.config_instance.backend[len("/cloudberry_app/schema/transform/dynamic/"):])
+                id=self.config_instance.backend.split("/")[-1])
         return self._model
-   
+
     @property
     def schema(self):
-        return self.model.schema
+        return self.model.extended_schema
 
     def transformed(self):
         return jpot.transform(self.config, self.model.transform)
