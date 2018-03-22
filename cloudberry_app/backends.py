@@ -27,8 +27,9 @@ class TemplatedBackend(BaseBackend):
 
     def transformed(self):
         return jpot.transform(
-            # FIXME: This gets rid of ordered dicts, see https://github.com/adriank/ObjectPath/issues/25
-            json.loads(json.dumps({"config": self.config, "context": self.context})),
+            # FIXME: This gets rid of ordered dicts, see
+            # https://github.com/adriank/ObjectPath/issues/25
+            {"config": json.loads(json.dumps(self.config)), "context": self.context},
             self.model.transform,
             verbatim_str=True,
             path_engine=jpot.path_objectpath)

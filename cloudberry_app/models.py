@@ -17,6 +17,7 @@ from django.utils.module_loading import import_string
 from model_utils import Choices
 from model_utils.fields import StatusField
 import hashlib
+import importlib
 
 class Backend(BaseModel):
     def get_backends(*arg, **kw):
@@ -60,14 +61,20 @@ class Backend(BaseModel):
         schema = dict(schema)
         if 'definitions' not in schema:
             schema['definitions'] = {}
-        devices = Device.objects.all().order_by('name')
-        schema['definitions']['foreign_key__device'] = {
-            'title': 'Device',
-            'type': 'object',
-            'options': {'enum_titles': [device.name for device in devices]},
-            'enum': [{'model': 'cloudberry_app.models.Device', 'id': str(devices.id)}
-                     for devices in devices]
-        }
+        def add_foreign_key(model, title):
+            module, cls = model.rsplit(".", 1)
+            model_cls = getattr(importlib.import_module(module), cls)
+            instances = model_cls.objects.all().order_by(title)
+            schema['definitions']['fk__%s' % model.replace(".", "_")] = {
+                'title': cls,
+                'type': 'object',
+                'options': {'enum_titles': [getattr(instance, title) for instance in instances]},
+                'enum': [{'model': model, 'id': str(instance.id)}
+                         for instance in instances]
+            }
+        add_foreign_key("cloudberry_app.models.Device", "name")
+        add_foreign_key("django_x509.models.Ca", "name")
+        add_foreign_key("django_x509.models.Cert", "name")
         return schema
 
     @property
