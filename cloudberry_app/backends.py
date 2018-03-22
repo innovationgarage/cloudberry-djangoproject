@@ -3,6 +3,7 @@ import jpot
 import netjsonconfig
 import cloudberry_app.models
 from django.utils.module_loading import import_string
+import json
 
 class TemplatedBackend(BaseBackend):
     def __init__(self, config=None, native=None, templates=None, context=None):
@@ -25,8 +26,13 @@ class TemplatedBackend(BaseBackend):
         return self.model.extended_schema
 
     def transformed(self):
-        return jpot.transform(self.config, self.model.transform)
-
+        return jpot.transform(
+            # FIXME: This gets rid of ordered dicts, see https://github.com/adriank/ObjectPath/issues/25
+            json.loads(json.dumps({"config": self.config, "context": self.context})),
+            self.model.transform,
+            verbatim_str=True,
+            path_engine=jpot.path_objectpath)
+    
     def get_backend_instance(self):
         inst = self.model.backend_class(
             config=self.transformed(),

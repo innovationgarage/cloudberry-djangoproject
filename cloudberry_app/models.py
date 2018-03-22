@@ -113,13 +113,17 @@ class Config(BaseConfig):
         elif self.backend.startswith("/cloudberry_app/schema/backend/"):
             return import_string(self.backend[len("/cloudberry_app/schema/backend/"):])
 
-    def get_backend_instance(self, template_instances=None):
-        inst = AbstractConfig.get_backend_instance(self, template_instances)
+    def get_backend_instance(self, context=None):
+        backend = self.backend_class
+        kwargs = {'config': self.get_config()}
+        if context:
+            kwargs['context'] = context
+        inst = backend(**kwargs)
         inst.config_instance = self
         return inst
 
-    def get_lowest_backend_instance(self):
-        obj = self
+    def get_lowest_backend_instance(self, context):
+        obj = self.get_backend_instance(context)
         while hasattr(obj, 'get_backend_instance'):
             obj = obj.get_backend_instance()
         return obj
@@ -179,13 +183,23 @@ class Device(AbstractDevice2):
 
     def get_backend_instance(self):
         backend = self.backend_class
-        kwargs = {'config': {}}
+        kwargs = {'config': {},
+                  'context': self.get_context()}
         if hasattr(self, 'configs'):
             configs = self.configs.all()
-            kwargs['templates'] = [c.get_lowest_backend_instance().config for c in configs]
-        if hasattr(self, 'get_context'):
-            kwargs['context'] = self.get_context()
+            kwargs['templates'] = [
+                c.get_lowest_backend_instance(kwargs['context']).config
+                for c in configs]
         return backend(**kwargs)
+
+    def get_context(self):
+        def mangle(value):
+            if isinstance(value, (bool, type(None), str, int, float)):
+                return value
+            else:
+                return str(value)
+        return {'device': {f.name: mangle(getattr(self, f.name))
+                           for f in self._meta.fields}}
     
     # The controller expects a single config object with the
     # methods defined below, so we synthesize it...
