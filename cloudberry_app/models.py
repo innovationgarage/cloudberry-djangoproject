@@ -21,6 +21,7 @@ import importlib
 from jsonschema import FormatChecker, validate
 from jsonschema.exceptions import ValidationError as JsonSchemaError
 from netjsonconfig.exceptions import ValidationError
+import django.apps
 
 class BackendedModelMixin(object):
     schema_prefix = "/cloudberry_app/schema"
@@ -90,8 +91,8 @@ class Backend(BaseModel, BackendedModelMixin, TemplatedBackend):
         if 'definitions' not in schema:
             schema['definitions'] = {}
         def add_foreign_key(model, title):
-            module, cls = model.rsplit(".", 1)
-            model_cls = getattr(importlib.import_module(module), cls)
+            app_label, cls = model.rsplit(".", 1)
+            model_cls = django.apps.apps.get_registered_model(app_label, cls)
             instances = model_cls.objects.all().order_by(title)
             schema['definitions']['fk__%s' % model.replace(".", "_")] = {
                 'title': cls,
@@ -100,9 +101,9 @@ class Backend(BaseModel, BackendedModelMixin, TemplatedBackend):
                 'enum': [{'model': model, 'id': str(instance.id)}
                          for instance in instances]
             }
-        add_foreign_key("cloudberry_app.models.Device", "name")
-        add_foreign_key("django_x509.models.Ca", "name")
-        add_foreign_key("django_x509.models.Cert", "name")
+        add_foreign_key("cloudberry_app.Device", "name")
+        add_foreign_key("django_x509.Ca", "name")
+        add_foreign_key("django_x509.Cert", "name")
         return schema
 
     @property
@@ -169,6 +170,27 @@ class AbstractDevice2(AbstractDevice):
     class Meta(AbstractDevice.Meta):
         abstract = True
 
+def model_to_dict(model):
+    def mangle(value):
+        if isinstance(value, (bool, type(None), str, int, float)):
+            return value
+        else:
+            return str(value)
+    return {f.name: mangle(getattr(model, f.name))
+            for f in model._meta.fields}
+    
+        
+class FkLookup(object):
+    def __getitem__(self, name):
+        return FkLookupModel(name)
+    
+class FkLookupModel(object):
+    def __init__(self, model):
+        self.model = django.apps.apps.get_registered_model(*model.split("."))
+        
+    def __getitem__(self, id):
+        return model_to_dict(self.model.objects.get(id=id))
+        
 class Device(AbstractDevice2, BackendedModelMixin):
     STATUS = Choices('modified', 'running', 'error')
     status = StatusField(help_text=_(
@@ -207,13 +229,8 @@ class Device(AbstractDevice2, BackendedModelMixin):
             for c in self.configs.all()]
     
     def get_context(self):
-        def mangle(value):
-            if isinstance(value, (bool, type(None), str, int, float)):
-                return value
-            else:
-                return str(value)
-        return {'device': {f.name: mangle(getattr(self, f.name))
-                           for f in self._meta.fields}}
+        return {'device': model_to_dict(self),
+                'fk': FkLookup()}
     
     # The controller expects a single config object with the
     # methods defined below, so we synthesize it...
