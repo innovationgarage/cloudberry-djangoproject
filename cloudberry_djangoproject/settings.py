@@ -137,3 +137,9 @@ STATIC_URL = '/static/'
 # INSTALLED_APPS
 import imp
 STATICFILES_DIRS = [os.path.join(imp.find_module("django_netjsonconfig")[1], 'static')]
+
+NETJSONCONFIG_BACKENDS = (
+    ('cloudberry_netjson.OpenWrt', 'OpenWRT/Cloudberry'),
+    ('netjsonconfig.OpenWrt', 'OpenWRT/LEDE'),
+    ('netjsonconfig.OpenWisp', 'OpenWISP Firmware 1.x'))
+

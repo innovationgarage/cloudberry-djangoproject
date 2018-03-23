@@ -27,15 +27,17 @@ class BackendedModelMixin(object):
     schema_prefix = "/cloudberry_app/schema"
     
     @classmethod
-    def get_backends(cls, *arg, **kw):
+    def get_backends(cls, schema_prefix=None):
+        if schema_prefix is None:
+            schema_prefix = cls.schema_prefix
         for item in app_settings.BACKENDS:
-            yield ("%s/backend/%s" % (cls.schema_prefix, item[0]), item[1])
+            yield ("%s/backend/%s" % (schema_prefix, item[0]), item[1])
         try:
             Backend
         except:
             return
         for backend in Backend.objects.all():
-            yield ("%s/dynamic/%s" % (cls.schema_prefix, backend.id), backend.name)    
+            yield ("%s/dynamic/%s" % (schema_prefix, backend.id), backend.name)    
 
     def get_context(self):
         return getattr(self, 'context', {})
@@ -54,7 +56,7 @@ class BackendedModelMixin(object):
             backend_cls = import_string(self.backend.split("/")[-1])
             backend = backend_cls(**kwargs)
         else:
-            raise Exception("Unknown backend path: %s" % self.backend)
+            raise Exception("Unknown backend path %s in %s" % (self.backend, type(self)))
         return backend
 
 class TemplatedBackend(cloudberry_app.backends.TemplatedBackend):
@@ -67,7 +69,7 @@ class Backend(BaseModel, BackendedModelMixin, TemplatedBackend):
     schema_prefix = "/cloudberry_app/schema/transform"
 
     backend = models.CharField(_('backend'),
-                               choices=BackendedModelMixin.get_backends(),
+                               choices=BackendedModelMixin.get_backends(schema_prefix),
                                blank=True,
                                max_length=128,
                                help_text=_('Select <a href="http://netjsonconfig.openwisp.org/en/'
@@ -156,7 +158,7 @@ class Config(BackendedModelMixin, BaseConfig):
         backend = self.get_backend_instance()
         if hasattr(backend, "extract_foreign_keys"):
             self.devices.clear()
-            for device in backend.extract_foreign_keys(self.config, 'cloudberry_app.models.Device'):
+            for device in backend.extract_foreign_keys(self.config, 'cloudberry_app.Device'):
                 self.devices.add(device)
     
 class AbstractDevice2(AbstractDevice):
@@ -180,19 +182,28 @@ def model_to_dict(model):
         else:
             return str(value)
     return {f.name: mangle(getattr(model, f.name))
-            for f in model._meta.fields}
-    
+            for f in model._meta.fields}    
         
 class FkLookup(object):
     def __getitem__(self, name):
         return FkLookupModel(name)
+    def __repr__(self):
+        return 'FkLookup'
     
 class FkLookupModel(object):
     def __init__(self, model):
+        self.model_name = model
         self.model = django.apps.apps.get_registered_model(*model.split("."))
         
     def __getitem__(self, id):
-        return model_to_dict(self.model.objects.get(id=id))
+        try:
+            return model_to_dict(self.model.objects.get(id=id))
+        except Exception as e:
+            raise Exception("%s.objects.get(id=%s): %s" % (self.model_name, repr(id), e))
+
+    def __repr__(self):
+        return self.model_name
+
         
 class Device(AbstractDevice2, BackendedModelMixin):
     STATUS = Choices('modified', 'running', 'error')
@@ -241,6 +252,9 @@ class Device(AbstractDevice2, BackendedModelMixin):
     def _has_config(self):
         return False
 
+    def get_default_templates(self):
+        return []
+    
     @property
     def config(self):
         return self

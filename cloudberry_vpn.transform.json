@@ -1,0 +1,317 @@
+[[
+    {
+        "$if": "count($.config.clients[@.device.id is $.context.device.id]) > 0",
+        "general": {
+            "description": {"$get": "'Cloudberry VPN client ' + $.context.device.id"}
+        },
+        "openvpn": [[
+            {
+                "engine": "",
+                "status": "",
+                "verb": 3,
+                "comp_lzo": "yes",
+                "mssfix": 1450,
+                "mute": 0,
+                "fragment": 0,
+                "script_security": 1,
+                "ca": "/etc/ssl/ca.pem",
+                "secret": "",
+                "auth": "SHA1",
+                "status_version": 1,
+                "down": "",
+                "mute_replay_warnings": false,
+                "cipher": "AES-128-CBC",
+                "user": "",
+                "key": "/etc/ssl/cert.key.pem",
+                "persist_key": true,
+                "tun_ipv6": false,
+                "port": 1194,
+                "keepalive": "",
+                "group": "",
+                "name": "cloudberry",
+                "proto": "tcp-client",
+                "dev_type": "tun",
+                "up_delay": 0,
+                "up": "",
+                "dev": "tun0",
+                "cert": "/etc/ssl/cert.pem",
+                "persist_tun": true,
+                "mode": "p2p",
+                "fast_io": false,
+                "log": "",
+                "mtu_test": false,
+                "local": "",
+                "ns_cert_type": "server",
+                "disabled": false,
+                "tls_client": true,
+                "nobind": true,
+                "remote": [[
+                    {
+                        "host": {"$get": "$.config.server.hostname"},
+                        "port": {"$get": "$.config.server.port"}
+                    }
+                ]],
+                "auth_user_pass": "",
+                "pull": true,
+                "resolv_retry": "infinite"
+            }
+        ]],
+        "files": [[
+            {
+                "path": "/etc/ssl/ca.pem",
+                "mode": "0644",
+                "contents": {"$get": "$.context.fk['django_x509.Ca'][$.context.fk['django_x509.Cert'][$.config.clients[@.device.id is $.context.device.id][0].certificate.id].ca.id].certificate"}
+            },
+            {
+                "path": "/etc/ssl/cert.pem",
+                "mode": "0644",
+                "contents": {"$get": "$.context.fk['django_x509.Cert'][$.config.clients[@.device.id is $.context.device.id][0].certificate.id].certificate"}
+            },
+            {
+                "path": "/etc/ssl/cert.key.pem",
+                "mode": "0644",
+                "contents": {"$get": "$.context.fk['django_x509.Cert'][$.config.clients[@.device.id is $.context.device.id][0].certificate.id].private_key"}
+            }
+        ]],
+        "interfaces": [[
+            {
+                "type": "other",
+                "addresses": [[]],
+                "name": "tun0",
+                "mtu": 1500,
+                "disabled": false,
+                "mac": "",
+                "autostart": false,
+                "network": "vpn"
+            },
+            {
+                "type": "ethernet",
+                "addresses": [[
+                    {
+                        "family": "ipv4",
+                        "proto": "static",
+                        "mask": 24,
+                        "gateway": "",
+                        "address": {"$get": "$.config.clients[@.device.id is $.context.device.id][0].lan.network"}
+                    }
+                ]],
+                "name": "eth1",
+                "mtu": 1500,
+                "disabled": false,
+                "mac": "",
+                "autostart": true,
+                "network": "lan"
+            },
+            {
+                "type": "ethernet",
+                "addresses": [[
+                    {
+                        "family": "ipv4",
+                        "proto": "dhcp"
+                    }
+                ]],
+                "name": "eth0",
+                "mtu": 1500,
+                "disabled": false,
+                "mac": "",
+                "autostart": true,
+                "network": "wan"
+            }
+        ]],
+        "forwarding": [[
+            {
+                "dest": "lan",
+                "src": "vpn"
+            },
+            {
+                "dest": "vpn",
+                "src": "lan"
+            },
+            {
+                "dest": "lan",
+                "src": "wan"
+            },
+            {
+                "dest": "wan",
+                "src": "lan"
+            }
+        ]],
+        "zones": [[
+            {
+                "name": "vpn",
+                "forward": "ACCEPT",
+                "masq": "1",
+                "input": "ACCEPT",
+                "output": "ACCEPT",
+                "network": [[
+                    "vpn"
+                ]]
+            },
+            {
+                "name": "lan",
+                "forward": "ACCEPT",
+                "masq": "0",
+                "input": "ACCEPT",
+                "output": "ACCEPT",
+                "network": [[
+                    "lan"
+                ]]
+            },
+            {
+                "name": "wan",
+                "forward": "ACCEPT",
+                "masq": "1",
+                "input": "ACCEPT",
+                "output": "ACCEPT",
+                "network": [[
+                    "wan"
+                ]]
+            }
+        ]]
+    },
+    {
+        "$if": "$.config.server.device.id is $.context.device.id",
+        "general": {
+            "description": {"$get": "'Cloudberry VPN server ' + $.context.device.id"}
+        },
+        "openvpn": [[
+            {
+                "engine": "",
+                "status": "",
+                "verb": 3,
+                "comp_lzo": "adaptive",
+                "mssfix": 1450,
+                "mute": 0,
+                "fragment": 0,
+                "script_security": 1,
+                "ca": "/etc/ssl/ca.pem",
+                "secret": "",
+                "auth": "SHA1",
+                "status_version": 1,
+                "down": "",
+                "mute_replay_warnings": false,
+                "cipher": "BF-CBC",
+                "user": "",
+                "key": "/etc/ssl/cert.key.pem",
+                "persist_key": true,
+                "tun_ipv6": false,
+                "port": 1194,
+                "keepalive": "",
+                "group": "",
+                "name": "myvpn",
+                "proto": "tcp-server",
+                "dev_type": "tun",
+                "up_delay": 0,
+                "up": "",
+                "dev": "tun0",
+                "cert": "/etc/ssl/cert.pem",
+                "persist_tun": true,
+                "mode": "server",
+                "fast_io": false,
+                "log": "",
+                "mtu_test": false,
+                "local": "",
+                "disabled": false,
+                "dh": "/etc/ssl/dh.pem",
+                "client_to_client": true,
+                "username_as_common_name": false,
+                "auth_user_pass_verify": "",
+                "client_cert_not_required": false,
+                "duplicate_cn": false,
+                "crl_verify": "",
+                "topology": "p2p",
+                "tls_server": true,
+                "server": "10.8.0.0 255.255.255.0",
+                "push": [
+                    "$.config.clients.*.lan",
+                    {"$get": "'route ' + $.network + ' ' + $.netmask"}
+                ],
+                "client_config_dir": "/etc/openvpn/ccd"
+            }
+        ]],
+        "files": [
+            [
+                [[
+                    {
+                        "path": "/etc/ssl/ca.pem",
+                        "mode": "0644",
+                        "contents": {"$get": "$.context.fk['django_x509.Ca'][$.context.fk['django_x509.Cert'][$.config.server.certificate.id].ca.id].certificate"}
+                    },
+                    {
+                        "path": "/etc/ssl/cert.pem",
+                        "mode": "0644",
+                        "contents": {"$get": "$.context.fk['django_x509.Cert'][$.config.server.certificate.id].certificate"}
+                    },
+                    {
+                        "path": "/etc/ssl/cert.key.pem",
+                        "mode": "0644",
+                        "contents": {"$get": "$.context.fk['django_x509.Cert'][$.config.server.certificate.id].private_key"}
+                    },
+                    {
+                        "path": "/etc/ssl/dh.pem",
+                        "mode": "0644",
+                        "contents": "WHERE DO WE GET THIS????"
+                    }
+                ]],
+                ["$.config.clients",
+                 {
+                     "path": {"$get": "'/etc/openvpn/ccd/' + $.device.id"},
+                     "mode": "0644",
+                     "contents": {"$get": "'iroute ' + $.lan.network + ' ' + $.lan.netmask"}
+                 }
+                ]
+            ],
+            {"$get": "$.*"},
+            {"$get": "$.*[0] + $.*[1]"}
+        ],
+        "zones": [[
+            {
+                "name": "vpn",
+                "forward": "ACCEPT",
+                "input": "ACCEPT",
+                "device": "tun0",
+                "output": "ACCEPT"
+            },
+            {
+                "name": "lan",
+                "forward": "ACCEPT",
+                "masq": "1",
+                "input": "ACCEPT",
+                "device": "eth0",
+                "output": "ACCEPT"
+            }
+        ]],
+        "forwarding": [[
+            {
+                "dest": "vpn",
+                "src": "lan"
+            },
+            {
+                "dest": "lan",
+                "src": "vpn"
+            }
+        ]],
+        "interfaces": [[
+            {
+                "type": "other",
+                "addresses": [[]],
+                "name": "tun0",
+                "mtu": 1500,
+                "disabled": false,
+                "mac": "",
+                "autostart": false,
+                "network": "vpn"
+            },
+            {
+                "type": "ethernet",
+                "addresses": [[]],
+                "name": "eth0",
+                "mtu": 1500,
+                "disabled": false,
+                "mac": "",
+                "autostart": true,
+                "network": "lan"
+            }
+        ]]
+    }
+], {"$get": "$.*"}, {"$get": "$.*[0]"}]
