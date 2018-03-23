@@ -174,6 +174,9 @@ def model_to_dict(model):
     def mangle(value):
         if isinstance(value, (bool, type(None), str, int, float)):
             return value
+        elif isinstance(value, models.Model):
+            return {'model': "%s.%s" % (value._meta.app_label, value._meta.model_name),
+                    'id': str(value.id)}
         else:
             return str(value)
     return {f.name: mangle(getattr(model, f.name))
