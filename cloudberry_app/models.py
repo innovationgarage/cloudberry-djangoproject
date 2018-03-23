@@ -18,19 +18,55 @@ from model_utils import Choices
 from model_utils.fields import StatusField
 import hashlib
 import importlib
+from jsonschema import FormatChecker, validate
+from jsonschema.exceptions import ValidationError as JsonSchemaError
+from netjsonconfig.exceptions import ValidationError
 
-class Backend(BaseModel):
-    def get_backends(*arg, **kw):
+class BackendedModelMixin(object):
+    schema_prefix = "/cloudberry_app/schema"
+    
+    @classmethod
+    def get_backends(cls, *arg, **kw):
         for item in app_settings.BACKENDS:
-            yield ("/cloudberry_app/schema/transform/backend/%s" % item[0], item[1])
+            yield ("%s/backend/%s" % (cls.schema_prefix, item[0]), item[1])
         try:
             Backend
         except:
             return
         for backend in Backend.objects.all():
-            yield ("/cloudberry_app/schema/transform/dynamic/%s" % backend.id, backend.name)
+            yield ("%s/dynamic/%s" % (cls.schema_prefix, backend.id), backend.name)    
+
+    def get_context(self):
+        return getattr(self, 'context', {})
+
+    def get_templates(self):
+        return []
+    
+    def get_backend_instance(self):
+        kwargs = {'config': self.get_config(),
+                  'context': self.get_context(),
+                  'templates': self.get_templates()}
+        if self.backend.startswith("%s/dynamic/" % self.schema_prefix):
+            backend = Backend.objects.get(id=self.backend.split("/")[-1])
+            backend.init_backend(**kwargs)
+        elif self.backend.startswith("%s/backend/" % self.schema_prefix):
+            backend_cls = import_string(self.backend.split("/")[-1])
+            backend = backend_cls(**kwargs)
+        else:
+            raise Exception("Unknown backend path: %s" % self.backend)
+        return backend
+
+class TemplatedBackend(cloudberry_app.backends.TemplatedBackend):
+    def __init__(self, *arg, **kw):
+        pass
+
+    init_backend = cloudberry_app.backends.TemplatedBackend.__init__
+    
+class Backend(BaseModel, BackendedModelMixin, TemplatedBackend):
+    schema_prefix = "/cloudberry_app/schema/transform"
+
     backend = models.CharField(_('backend'),
-                               choices=get_backends(),
+                               choices=BackendedModelMixin.get_backends(),
                                blank=True,
                                max_length=128,
                                help_text=_('Select <a href="http://netjsonconfig.openwisp.org/en/'
@@ -48,15 +84,7 @@ class Backend(BaseModel):
                                    'to transform the schema to that of the back-end and/or template'),
                        load_kwargs={'object_pairs_hook': collections.OrderedDict},
                        dump_kwargs={'indent': 4})
-
-    @cached_property
-    def backend_class(self):
-        if self.backend.startswith("/cloudberry_app/schema/transform/dynamic/"):
-            return cloudberry_app.backends.TemplatedBackend
-        elif self.backend.startswith("/cloudberry_app/schema/transform/backend/"):
-            return import_string(self.backend[len("/cloudberry_app/schema/transform/backend/"):])
-
-   
+    
     def _schema_add_foreign_keys(self, schema):
         schema = dict(schema)
         if 'definitions' not in schema:
@@ -80,6 +108,12 @@ class Backend(BaseModel):
     @property
     def extended_schema(self):
         return self._schema_add_foreign_keys(self.schema)
+    
+    def validate(self):
+        try:
+            validate(self.config, self.extended_schema, format_checker=FormatChecker())
+        except JsonSchemaError as e:
+            raise ValidationError(e)
 
     def extract_foreign_keys(self, config, model):
         if isinstance(config, (dict, collections.OrderedDict)):
@@ -94,43 +128,23 @@ class Backend(BaseModel):
                 for fk in self.extract_foreign_keys(value, model):
                     yield fk
                     
-class Config(BaseConfig):
+class Config(BackendedModelMixin, BaseConfig):
     class Meta(BaseConfig.Meta):
         abstract = False
 
     devices = models.ManyToManyField('cloudberry_app.Device', related_name='configs')
 
     device = None
-    def get_backends(*arg, **kw):
-        for item in app_settings.BACKENDS:
-            yield ("/cloudberry_app/schema/backend/%s" % item[0], item[1])
-        for backend in Backend.objects.all():
-            yield ("/cloudberry_app/schema/dynamic/%s" % backend.id, backend.name)
     backend = models.CharField(_('backend'),
-                               choices=get_backends(),
+                               choices=BackendedModelMixin.get_backends(),
                                blank=True,
                                max_length=128,
                                help_text=_('Select <a href="http://netjsonconfig.openwisp.org/en/'
                                            'stable/" target="_blank">netjsonconfig</a> backend'))
 
-    @cached_property
-    def backend_class(self):
-        if self.backend.startswith("/cloudberry_app/schema/dynamic/"):
-            return cloudberry_app.backends.TemplatedBackend
-        elif self.backend.startswith("/cloudberry_app/schema/backend/"):
-            return import_string(self.backend[len("/cloudberry_app/schema/backend/"):])
-
-    def get_backend_instance(self, context=None):
-        backend = self.backend_class
-        kwargs = {'config': self.get_config()}
-        if context:
-            kwargs['context'] = context
-        inst = backend(**kwargs)
-        inst.config_instance = self
-        return inst
-
     def get_lowest_backend_instance(self, context):
-        obj = self.get_backend_instance(context)
+        self.context = context
+        obj = self.get_backend_instance()
         while hasattr(obj, 'get_backend_instance'):
             obj = obj.get_backend_instance()
         return obj
@@ -155,7 +169,7 @@ class AbstractDevice2(AbstractDevice):
     class Meta(AbstractDevice.Meta):
         abstract = True
 
-class Device(AbstractDevice2):
+class Device(AbstractDevice2, BackendedModelMixin):
     STATUS = Choices('modified', 'running', 'error')
     status = StatusField(help_text=_(
         'modified means the configuration is not applied yet; '
@@ -182,23 +196,16 @@ class Device(AbstractDevice2):
         return ", ".join([c.name for c in self.configs.all()])
     get_config_list.short_description = "Configurations"
 
-
-
-    @cached_property
-    def backend_class(self):
-        return import_string(self.backend.split("/")[-1])
-
-    def get_backend_instance(self):
-        backend = self.backend_class
-        kwargs = {'config': {},
-                  'context': self.get_context()}
-        if hasattr(self, 'configs'):
-            configs = self.configs.all()
-            kwargs['templates'] = [
-                c.get_lowest_backend_instance(kwargs['context']).config
-                for c in configs]
-        return backend(**kwargs)
-
+    def get_config(self):
+        return {}
+    
+    def get_templates(self):
+        if not hasattr(self, 'configs'):
+            return []
+        return [
+            c.get_lowest_backend_instance(self.get_context()).config
+            for c in self.configs.all()]
+    
     def get_context(self):
         def mangle(value):
             if isinstance(value, (bool, type(None), str, int, float)):
