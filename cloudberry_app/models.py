@@ -135,7 +135,8 @@ class Config(BackendedModelMixin, BaseConfig):
     class Meta(BaseConfig.Meta):
         abstract = False
 
-    devices = models.ManyToManyField('cloudberry_app.Device', related_name='configs')
+    refers_devices = models.ManyToManyField('cloudberry_app.Device', related_name='referred_in_configs')
+    refers_configs = models.ManyToManyField('cloudberry_app.Config', related_name='referred_in_configs')
 
     device = None
     backend = models.CharField(_('backend'),
@@ -157,9 +158,13 @@ class Config(BackendedModelMixin, BaseConfig):
 
         backend = self.get_backend_instance()
         if hasattr(backend, "extract_foreign_keys"):
-            self.devices.clear()
+            self.refers_devices.clear()
+            self.refers_configs.clear()
             for device in backend.extract_foreign_keys(self.config, 'cloudberry_app.Device'):
-                self.devices.add(device)
+                self.refers_devices.add(device)
+
+            for config in backend.extract_foreign_keys(self.config, 'cloudberry_app.Config'):
+                self.refers_configs.add(config)
     
 class AbstractDevice2(AbstractDevice):
     # This whole class is a hack, to be able to override a @property
@@ -229,18 +234,18 @@ class Device(AbstractDevice2, BackendedModelMixin):
         abstract = False
 
     def get_config_list(self):
-        return ", ".join([c.name for c in self.configs.all()])
+        return ", ".join([c.name for c in self.referred_in_configs.all()])
     get_config_list.short_description = "Configurations"
 
     def get_config(self):
         return {}
     
     def get_templates(self):
-        if not hasattr(self, 'configs'):
+        if not hasattr(self, 'referred_in_configs'):
             return []
         return [
             c.get_lowest_backend_instance(self.get_context()).config
-            for c in self.configs.all()]
+            for c in self.referred_in_configs.all()]
     
     def get_context(self):
         return {'device': model_to_dict(self),
