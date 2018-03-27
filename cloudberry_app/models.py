@@ -201,7 +201,10 @@ class FkLookup(object):
 class FkLookupModel(object):
     def __init__(self, model):
         self.model_name = model
-        self.model = django.apps.apps.get_registered_model(*model.split("."))
+        try:
+            self.model = django.apps.apps.get_registered_model(*model.split("."))
+        except:
+            raise Exception("Unable to get registered model %s" % model)
         
     def __getitem__(self, id):
         try:

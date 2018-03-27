@@ -1,5 +1,5 @@
 from netjsonconfig.backends.base.backend import BaseBackend
-import jpot
+import sakform
 import netjsonconfig
 import cloudberry_app.models
 from django.utils.module_loading import import_string
@@ -16,13 +16,9 @@ class TemplatedBackend(BaseBackend):
         BaseBackend.__init__(self, config, native)
 
     def get_config(self):
-        return jpot.transform(
-            # FIXME: This gets rid of ordered dicts, see
-            # https://github.com/adriank/ObjectPath/issues/25
-            {"config": json.loads(json.dumps(self.config)), "context": self.context},
-            self.transform,
-            verbatim_str=True,
-            path_engine=jpot.path_objectpath)
+        return sakform.transform(
+            {"config": self.config, "context": self.context},
+            self.transform)[0]
     
     def get_context(self):
         return self.context
