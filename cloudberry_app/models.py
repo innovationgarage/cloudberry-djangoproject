@@ -147,6 +147,9 @@ class Config(BackendedModelMixin, BaseConfig):
                                            'stable/" target="_blank">netjsonconfig</a> backend'))
 
     def get_lowest_backend_instance(self, context):
+        context = dict(context)
+        context['referred_in_configs'] = [{'model': 'cloudberry_app.Config', 'id': str(instance.id)}
+                                          for instance in self.referred_in_configs.all()]
         self.context = context
         obj = self.get_backend_instance()
         while hasattr(obj, 'get_backend_instance'):
