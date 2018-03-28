@@ -10,7 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.0/ref/settings/
 """
 
-import os
+import os, sys, imp
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -136,7 +136,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 # extendnetjson: We need to include the static files from
 # django_netjsonconfig manually, as django_netjsonconfig is not in
 # INSTALLED_APPS
-import imp
 STATICFILES_DIRS = [os.path.join(imp.find_module("django_netjsonconfig")[1], 'static')]
 
 NETJSONCONFIG_BACKENDS = (
@@ -144,3 +143,8 @@ NETJSONCONFIG_BACKENDS = (
     ('netjsonconfig.OpenWrt', 'OpenWRT/LEDE'),
     ('netjsonconfig.OpenWisp', 'OpenWISP Firmware 1.x'))
 
+
+if 'runserver' in sys.argv:
+    ROOT = ''
+else:
+    ROOT = '/cloudberry'

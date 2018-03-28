@@ -23,6 +23,7 @@ from jsonschema.exceptions import ValidationError as JsonSchemaError
 from netjsonconfig.exceptions import ValidationError
 import django.apps
 from django.utils.functional import lazy
+from django.conf import settings
 
 class BackendedModelMixin(object):
     schema_prefix = "/cloudberry_app/schema"
@@ -31,6 +32,7 @@ class BackendedModelMixin(object):
     def get_backends(cls, schema_prefix=None):
         if schema_prefix is None:
             schema_prefix = cls.schema_prefix
+        schema_prefix = settings.ROOT + schema_prefix
         for item in app_settings.BACKENDS:
             yield ("%s/backend/%s" % (schema_prefix, item[0]), item[1])
         try:
