@@ -22,6 +22,7 @@ from jsonschema import FormatChecker, validate
 from jsonschema.exceptions import ValidationError as JsonSchemaError
 from netjsonconfig.exceptions import ValidationError
 import django.apps
+from django.utils.functional import lazy
 
 class BackendedModelMixin(object):
     schema_prefix = "/cloudberry_app/schema"
@@ -63,16 +64,29 @@ class TemplatedBackend(cloudberry_app.backends.TemplatedBackend):
         pass
 
     init_backend = cloudberry_app.backends.TemplatedBackend.__init__
+
+class DynamicTextListField(models.CharField):
+    def __init__(self, *arg, **kw):
+        models.CharField.__init__(self, choices=[("dummy", "dummy")], *arg, **kw)
+    @property
+    def choices(self):
+        return self.choices_fn()
+    @choices.setter
+    def choices(self, value):
+        pass
+    def choices_fn(self):
+        raise NotImplementedError
     
 class Backend(BaseModel, BackendedModelMixin, TemplatedBackend):
     schema_prefix = "/cloudberry_app/schema/transform"
-
-    backend = models.CharField(_('backend'),
-                               choices=BackendedModelMixin.get_backends(schema_prefix),
-                               blank=True,
-                               max_length=128,
-                               help_text=_('Select <a href="http://netjsonconfig.openwisp.org/en/'
-                                           'stable/" target="_blank">netjsonconfig</a> backend'))
+    
+    backend = DynamicTextListField(_('backend'),
+                                   blank=True,
+                                   max_length=128,
+                                   help_text=_('Select <a href="http://netjsonconfig.openwisp.org/en/'
+                                               'stable/" target="_blank">netjsonconfig</a> backend'))
+    backend.choices_fn = (lambda schema_prefix: (lambda: BackendedModelMixin.get_backends(schema_prefix)))(schema_prefix)
+    
     schema = JSONField(_('schema'),
                        default=dict,
                        blank=True,
@@ -139,12 +153,13 @@ class Config(BackendedModelMixin, BaseConfig):
     refers_configs = models.ManyToManyField('cloudberry_app.Config', related_name='referred_in_configs')
 
     device = None
-    backend = models.CharField(_('backend'),
-                               choices=BackendedModelMixin.get_backends(),
-                               blank=True,
-                               max_length=128,
-                               help_text=_('Select <a href="http://netjsonconfig.openwisp.org/en/'
-                                           'stable/" target="_blank">netjsonconfig</a> backend'))
+    
+    backend = DynamicTextListField(_('backend'),
+                                   blank=True,
+                                   max_length=128,
+                                   help_text=_('Select <a href="http://netjsonconfig.openwisp.org/en/'
+                                               'stable/" target="_blank">netjsonconfig</a> backend'))
+    backend.choices_fn = lambda: BackendedModelMixin.get_backends()
 
     def get_lowest_backend_instance(self, context):
         context = dict(context)
