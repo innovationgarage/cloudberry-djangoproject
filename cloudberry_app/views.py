@@ -4,7 +4,6 @@ import django_netjsonconfig.views
 import json
 import cloudberry_app.models
 import os.path
-import jpot
 import traceback
 
 with open(os.path.join(os.path.dirname(__file__), "json-schema-meta-schema.json")) as f:
@@ -54,7 +53,7 @@ def schema_transform_backend(request, schema):
     c = {"error": "Not found"}
     status = 404
     if schema in available_schemas:
-        c = jpot.schema_transform(available_schemas[schema])
+        c = available_schemas[schema]
         status = 200
     return HttpResponse(json.dumps(c), status=status, content_type='application/json')
 
@@ -62,8 +61,7 @@ def schema_transform_backend(request, schema):
 @check_auth
 def schema_transform_dynamic(request, schema):
     try:
-        c = jpot.schema_transform(
-            cloudberry_app.models.Backend.objects.get(id=schema).extended_schema)
+        c = cloudberry_app.models.Backend.objects.get(id=schema).extended_schema
         status = 200
     except:
         c = {"error": "Not found"}
