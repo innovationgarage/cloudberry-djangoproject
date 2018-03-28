@@ -52,10 +52,11 @@ class BackendedModelMixin(object):
         kwargs = {'config': self.get_config(),
                   'context': self.get_context(),
                   'templates': self.get_templates()}
-        if self.backend.startswith("%s/dynamic/" % self.schema_prefix):
+        schema_prefix = settings.ROOT + self.schema_prefix
+        if self.backend.startswith("%s/dynamic/" % schema_prefix):
             backend = Backend.objects.get(id=self.backend.split("/")[-1])
             backend.init_backend(**kwargs)
-        elif self.backend.startswith("%s/backend/" % self.schema_prefix):
+        elif self.backend.startswith("%s/backend/" % schema_prefix):
             backend_cls = import_string(self.backend.split("/")[-1])
             backend = backend_cls(**kwargs)
         else:
