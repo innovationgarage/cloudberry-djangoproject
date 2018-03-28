@@ -1,9 +1,13 @@
 {
-    "_": {"$": "@template().*"},
+    "_": {
+        "$": "@template().*"
+    },
     "clients": {
         "$": "$.config.clients.*[@.device.id is $.context.device.id]",
         "general": {
-            "description": {"$": "'Cloudberry VPN client ' + $.context.device.id"}
+            "description": {
+                "$": "'Cloudberry VPN client ' + $.context.device.id"
+            }
         },
         "openvpn": [
             {
@@ -48,8 +52,12 @@
                 "nobind": true,
                 "remote": [
                     {
-                        "host": {"$": "$.config.server.hostname"},
-                        "port": {"$": "$.config.server.port"}
+                        "host": {
+                            "$": "$.config.server.hostname"
+                        },
+                        "port": {
+                            "$": "$.config.server.port"
+                        }
                     }
                 ],
                 "auth_user_pass": "",
@@ -61,17 +69,23 @@
             {
                 "path": "/etc/ssl/ca.pem",
                 "mode": "0644",
-                "contents": {"$": "$.context.fk['django_x509.Ca'][$.context.fk['django_x509.Cert'][@template().certificate.id].ca.id].certificate"}
+                "contents": {
+                    "$": "$.context.fk['django_x509.Ca'][$.context.fk['django_x509.Cert'][@template().certificate.id].ca.id].certificate"
+                }
             },
             {
                 "path": "/etc/ssl/cert.pem",
                 "mode": "0644",
-                "contents": {"$": "$.context.fk['django_x509.Cert'][@template().certificate.id].certificate"}
+                "contents": {
+                    "$": "$.context.fk['django_x509.Cert'][@template().certificate.id].certificate"
+                }
             },
             {
                 "path": "/etc/ssl/cert.key.pem",
                 "mode": "0644",
-                "contents": {"$": "$.context.fk['django_x509.Cert'][@template().certificate.id].private_key"}
+                "contents": {
+                    "$": "$.context.fk['django_x509.Cert'][@template().certificate.id].private_key"
+                }
             }
         ],
         "interfaces": [
@@ -93,7 +107,9 @@
                         "proto": "static",
                         "mask": 24,
                         "gateway": "",
-                        "address": {"$": "@template().lan.network"}
+                        "address": {
+                            "$": "@template().lan.network"
+                        }
                     }
                 ],
                 "name": "eth1",
@@ -173,7 +189,9 @@
     "server": {
         "$": "$.config.server[@.device.id is $.context.device.id]",
         "general": {
-            "description": {"$": "'Cloudberry VPN server ' + $.context.device.id"}
+            "description": {
+                "$": "'Cloudberry VPN server ' + $.context.device.id"
+            }
         },
         "openvpn": [
             {
@@ -223,43 +241,65 @@
                 "topology": "p2p",
                 "tls_server": true,
                 "server": "10.8.0.0 255.255.255.0",
-                "push": [{
-                    "$": "$.config.clients.*.lan",
-                    "_": {"$": "@template().route"},
-                    "route": {"$": "'route ' + @template().network + ' ' + @template().netmask"}
-                }],
+                "push": [
+                    {
+                        "$": "$.config.clients.*.lan",
+                        "_": {
+                            "$": "@template().route"
+                        },
+                        "route": {
+                            "$": "'route ' + @template().network + ' ' + @template().netmask"
+                        }
+                    }
+                ],
                 "client_config_dir": "/etc/openvpn/ccd"
             }
         ],
-        "files": {"_": {"$": "[@template().*.*]"},
-                  "certs": [
-                      {
-                          "path": "/etc/ssl/ca.pem",
-                          "mode": "0644",
-                          "contents": {"$": "$.context.fk['django_x509.Ca'][$.context.fk['django_x509.Cert'][@template().certificate.id].ca.id].certificate"}
-                      },
-                      {
-                          "path": "/etc/ssl/cert.pem",
-                          "mode": "0644",
-                          "contents": {"$": "$.context.fk['django_x509.Cert'][@template().certificate.id].certificate"}
-                      },
-                      {
-                          "path": "/etc/ssl/cert.key.pem",
-                          "mode": "0644",
-                          "contents": {"$": "$.context.fk['django_x509.Cert'][@template().certificate.id].private_key"}
-                      },
-                      {
-                          "path": "/etc/ssl/dh.pem",
-                          "mode": "0644",
-                          "contents": "WHERE DO WE GET THIS????"
-                      }
-                  ],
-                  "ccds": [{"$": "$.config.clients.*",
-                            "path": {"$": "'/etc/openvpn/ccd/' + @template().device.id"},
-                            "mode": "0644",
-                            "contents": {"$": "'iroute ' + @template().lan.network + ' ' + @template().lan.netmask"}
-                           }]
-                 },
+        "files": {
+            "_": {
+                "$": "[@template().*.*]"
+            },
+            "certs": [
+                {
+                    "path": "/etc/ssl/ca.pem",
+                    "mode": "0644",
+                    "contents": {
+                        "$": "$.context.fk['django_x509.Ca'][$.context.fk['django_x509.Cert'][@template().certificate.id].ca.id].certificate"
+                    }
+                },
+                {
+                    "path": "/etc/ssl/cert.pem",
+                    "mode": "0644",
+                    "contents": {
+                        "$": "$.context.fk['django_x509.Cert'][@template().certificate.id].certificate"
+                    }
+                },
+                {
+                    "path": "/etc/ssl/cert.key.pem",
+                    "mode": "0644",
+                    "contents": {
+                        "$": "$.context.fk['django_x509.Cert'][@template().certificate.id].private_key"
+                    }
+                },
+                {
+                    "path": "/etc/ssl/dh.pem",
+                    "mode": "0644",
+                    "contents": "-----BEGIN DH PARAMETERS-----\nMIGHAoGBAM9Ofx22OpqnQtqbzmoPRCLMJGPdDO2juOojQLD/z/eeJkargfeBFd73\nyC0oALg50FjDtb5Qkk75XwydSsJd6Rbtxma7IxwWjV/GWzMreZILmGRTvaKMxDEM\nKqY4djuN2e1kOsIzVhGMyqj8gEpJO+4v676r+u7ugnNkHNfhInWjAgEC\n-----END DH PARAMETERS-----"
+                }
+            ],
+            "ccds": [
+                {
+                    "$": "$.config.clients.*",
+                    "path": {
+                        "$": "'/etc/openvpn/ccd/' + @template().device.id"
+                    },
+                    "mode": "0644",
+                    "contents": {
+                        "$": "'iroute ' + @template().lan.network + ' ' + @template().lan.netmask"
+                    }
+                }
+            ]
+        },
         "zones": [
             {
                 "name": "vpn",
