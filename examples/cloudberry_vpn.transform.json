@@ -133,7 +133,25 @@
                 "mac": "",
                 "autostart": true,
                 "network": "wan"
-            }
+            },
+             {
+                "type": "other",
+                "addresses": [
+                    {
+                        "family": "ipv4",
+                        "proto": "static",
+                        "mask": 24,
+                        "gateway": "",
+                        "address": "127.0.0.1"
+                    }
+                ],
+                "name": "lo",
+                "mtu": 1500,
+                "disabled": false,
+                "mac": "",
+                "autostart": true,
+                "network": "loopback"
+            }           
         ],
         "forwarding": [
             {
