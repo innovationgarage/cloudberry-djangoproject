@@ -1,0 +1,7 @@
+{
+    "properties": {
+        "device": {
+            "$ref": "#/definitions/fk__cloudberry_app_Device"
+        }
+    }
+}
