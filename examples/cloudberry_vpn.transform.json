@@ -134,7 +134,7 @@
                 "autostart": true,
                 "network": "wan"
             },
-             {
+            {
                 "type": "other",
                 "addresses": [
                     {
@@ -151,7 +151,7 @@
                 "mac": "",
                 "autostart": true,
                 "network": "loopback"
-            }           
+            }
         ],
         "forwarding": [
             {
@@ -309,7 +309,7 @@
                 {
                     "$": "$.config.clients.*",
                     "path": {
-                        "$": "'/etc/openvpn/ccd/' + @template().device.id"
+                        "$": "'/etc/openvpn/ccd/' + $.context.fk['django_x509.Cert'][@template().certificate.id].name"
                     },
                     "mode": "0644",
                     "contents": {
