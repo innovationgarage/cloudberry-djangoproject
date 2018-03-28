@@ -4,6 +4,7 @@ from django_netjsonconfig.base.device import AbstractDevice
 from django_netjsonconfig.base.tag import AbstractTaggedTemplate, AbstractTemplateTag
 from django_netjsonconfig.base.template import AbstractTemplate
 from django_netjsonconfig.base.vpn import AbstractVpn, AbstractVpnClient
+from django_netjsonconfig.validators import mac_address_validator
 from django.db import models
 from taggit.managers import TaggableManager
 from django.utils.translation import ugettext_lazy as _
@@ -68,8 +69,6 @@ class TemplatedBackend(cloudberry_app.backends.TemplatedBackend):
     init_backend = cloudberry_app.backends.TemplatedBackend.__init__
 
 class DynamicTextListField(models.CharField):
-    def __init__(self, *arg, **kw):
-        models.CharField.__init__(self, choices=[("dummy", "dummy")], *arg, **kw)
     @property
     def choices(self):
         return self.choices_fn()
@@ -77,7 +76,7 @@ class DynamicTextListField(models.CharField):
     def choices(self, value):
         pass
     def choices_fn(self):
-        raise NotImplementedError
+        return []
     
 class Backend(BaseModel, BackendedModelMixin, TemplatedBackend):
     schema_prefix = "/cloudberry_app/schema/transform"
@@ -265,6 +264,13 @@ class FkLookupModel(object):
 
         
 class Device(AbstractDevice2, BackendedModelMixin):
+    mac_address = models.CharField(max_length=17,
+                                   unique=True,
+                                   db_index=True,
+                                   null=True,
+                                   blank=True,
+                                   validators=[mac_address_validator],
+                                   help_text=_('primary mac address'))
     STATUS = Choices('modified', 'running', 'error')
     status = StatusField(help_text=_(
         'modified means the configuration is not applied yet; '
