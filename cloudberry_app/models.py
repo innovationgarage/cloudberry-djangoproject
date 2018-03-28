@@ -33,11 +33,10 @@ class BackendedModelMixin(object):
         for item in app_settings.BACKENDS:
             yield ("%s/backend/%s" % (schema_prefix, item[0]), item[1])
         try:
-            Backend
+            for backend in Backend.objects.all():
+                yield ("%s/dynamic/%s" % (schema_prefix, backend.id), backend.name)    
         except:
             return
-        for backend in Backend.objects.all():
-            yield ("%s/dynamic/%s" % (schema_prefix, backend.id), backend.name)    
 
     def get_context(self):
         return getattr(self, 'context', {})
