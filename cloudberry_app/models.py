@@ -293,7 +293,7 @@ class Device(AbstractDevice2, BackendedModelMixin):
                                                        '(except downloads from this page)'))
 
     backend = models.CharField(_('backend'),
-                               choices=[("/cloudberry_app/schema/backend/%s" % item[0], item[1]) for item in app_settings.BACKENDS],
+                               choices=[(settings.ROOT + "/cloudberry_app/schema/backend/%s" % item[0], item[1]) for item in app_settings.BACKENDS],
                                blank=True,
                                max_length=128,
                                help_text=_('Select <a href="http://netjsonconfig.openwisp.org/en/'
