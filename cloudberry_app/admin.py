@@ -131,8 +131,18 @@ class BackendAdmin(BaseAdmin):
         config = device.referred_in_configs.get(backend=form.instance.get_url(Config.schema_prefix))
         transformed = sakform.transform(
             {"config": config.config, "context": device.get_context()},
-            form.instance.transform)[0]
-    
+            json.loads(form['transform'].value()))[0]
+
+        backend = obj.backend_class(config=transformed, templates=obj.get_templates(), context=obj.get_context())
+        
+        try:
+            backend.validate()
+        except Exception as e:
+            django.contrib.messages.add_message(
+                request,
+                django.contrib.messages.WARNING,
+                e)
+
         django.contrib.messages.add_message(
             request,
             django.contrib.messages.INFO,

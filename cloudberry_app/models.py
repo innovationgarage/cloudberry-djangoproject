@@ -50,11 +50,8 @@ class BackendedModelMixin(object):
 
     def get_templates(self):
         return []
-    
-    def get_backend_instance(self):
-        kwargs = {'config': self.get_config(),
-                  'context': self.get_context(),
-                  'templates': self.get_templates()}
+
+    def backend_class(self, **kwargs):
         schema_prefix = settings.ROOT + self.schema_prefix
         if self.backend.startswith("%s/dynamic/" % schema_prefix):
             backend = Backend.objects.get(id=self.backend.split("/")[-1])
@@ -65,7 +62,7 @@ class BackendedModelMixin(object):
         else:
             raise Exception("Unknown backend path %s in %s" % (self.backend, type(self)))
         return backend
-
+    
 class TemplatedBackend(cloudberry_app.backends.TemplatedBackend):
     def __init__(self, *arg, **kw):
         pass
