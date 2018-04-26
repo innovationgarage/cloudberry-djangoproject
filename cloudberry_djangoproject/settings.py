@@ -143,6 +143,7 @@ NETJSONCONFIG_BACKENDS = (
     ('netjsonconfig.OpenWrt', 'OpenWRT/LEDE'),
     ('netjsonconfig.OpenWisp', 'OpenWISP Firmware 1.x'))
 
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 if 'runserver' in sys.argv:
     ROOT = ''

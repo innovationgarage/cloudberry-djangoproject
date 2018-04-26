@@ -42,6 +42,9 @@ class BackendedModelMixin(object):
         except:
             return
 
+    def get_url(self, schema_prefix = None):
+        return "%s/dynamic/%s" % (settings.ROOT + (schema_prefix or self.schema_prefix), self.id)
+
     def get_context(self):
         return getattr(self, 'context', {})
 
