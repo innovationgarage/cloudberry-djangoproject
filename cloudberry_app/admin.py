@@ -74,12 +74,17 @@ class PreviewField(django.forms.models.ModelChoiceField):
 
 class BackendForm(BaseForm):
     preview_config = PreviewField(queryset=Device.objects.all(), #filter(referred_in_configs__backend == ''),
-                                  required=False)
+                                  required=False, label='Preview transform using config')
 
+    def __init__(self, *arg, **kw):
+        BaseForm.__init__(self, *arg, **kw)
+        self.fields['preview_config'].queryset = self.fields['preview_config'].queryset.filter(
+            referred_in_configs__backend=self.instance.get_url(Config.schema_prefix))
+    
     def is_valid(self):
         if '_go_preview_config' in self.data:
             return False
-        BaseForm.is_valid(self)
+        return BaseForm.is_valid(self)
     
     class Meta(BaseForm.Meta):
         model = Backend
@@ -105,7 +110,7 @@ class BackendAdmin(BaseAdmin):
     model = Backend
     form = BackendForm
 
-    def preview(self, request, object_id=None):
+    def preview(self, request, object_id=None):        
         if object_id is None:
             obj = None
         else:
@@ -113,6 +118,14 @@ class BackendAdmin(BaseAdmin):
             if obj is None:
                 return self._get_obj_does_not_exist_redirect(request, self.model._meta, object_id)
         form = self.get_form(request, obj)(request.POST, request.FILES, instance=obj)
+
+        if not form['preview_config'].value():
+            django.contrib.messages.add_message(
+                request,
+                django.contrib.messages.WARNING,
+                _('Please select a config to use to preview the transform'))
+            return
+        
         device = cloudberry_app.models.Device.objects.get(id=form['preview_config'].value())
 
         config = device.referred_in_configs.get(backend=form.instance.get_url(Config.schema_prefix))
