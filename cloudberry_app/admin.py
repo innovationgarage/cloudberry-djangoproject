@@ -127,14 +127,13 @@ class BackendAdmin(BaseAdmin):
             return
         
         device = cloudberry_app.models.Device.objects.get(id=form['preview_config'].value())
-
         config = device.referred_in_configs.get(backend=form.instance.get_url(Config.schema_prefix))
-        transformed = sakform.transform(
-            {"config": config.config, "context": device.get_context()},
-            json.loads(form['transform'].value()))[0]
 
-        backend = obj.backend_class(config=transformed, templates=obj.get_templates(), context=obj.get_context())
-        
+        obj.transform = json.loads(form['transform'].value())
+        obj.config = config.config
+        obj.context = device.get_context()
+        backend = obj.get_backend_instance()
+
         try:
             backend.validate()
         except Exception as e:
@@ -146,7 +145,7 @@ class BackendAdmin(BaseAdmin):
         django.contrib.messages.add_message(
             request,
             django.contrib.messages.INFO,
-            django.utils.safestring.mark_safe('<div>Transformed config:</div><pre>%s</pre>' % django.utils.html.escape(json.dumps(transformed, indent=2))))
+            django.utils.safestring.mark_safe('<div>Transformed config:</div><pre>%s</pre>' % django.utils.html.escape(json.dumps(backend.config, indent=2))))
         
     @django.contrib.admin.options.csrf_protect_m
     def changeform_view(self, request, object_id=None, form_url='', extra_context=None):

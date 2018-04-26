@@ -17,7 +17,7 @@ class TemplatedBackend(BaseBackend):
 
     def get_config(self):
         return sakform.transform(
-            {"config": self.config, "context": self.context},
+            {"config": self.config, "context": self.get_context()},
             self.transform)[0]
     
     def get_context(self):
