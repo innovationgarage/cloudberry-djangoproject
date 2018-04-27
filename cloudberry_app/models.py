@@ -25,6 +25,8 @@ from netjsonconfig.exceptions import ValidationError
 import django.apps
 from django.utils.functional import lazy
 from django.conf import settings
+import django_x509.models
+import django_admin_ownership.models
 
 class BackendedModelMixin(object):
     schema_prefix = "/cloudberry_app/schema"
@@ -80,8 +82,12 @@ class DynamicTextListField(models.CharField):
         return []
     
 class Backend(BaseModel, BackendedModelMixin, TemplatedBackend):
+    group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
+                               on_delete=models.CASCADE)
+    __configuration_group = ["group"]
+
     schema_prefix = "/cloudberry_app/schema/transform"
-    
+
     backend = DynamicTextListField(_('backend'),
                                    blank=True,
                                    max_length=128,
@@ -156,6 +162,10 @@ class Backend(BaseModel, BackendedModelMixin, TemplatedBackend):
                     yield fk
                     
 class Config(BackendedModelMixin, BaseConfig):
+    group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
+                               on_delete=models.CASCADE)
+    __configuration_group = ["group"]
+
     class Meta(BaseConfig.Meta):
         abstract = False
 
@@ -273,6 +283,10 @@ class FkLookupModel(object):
 
         
 class Device(AbstractDevice2, BackendedModelMixin):
+    group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
+                               on_delete=models.CASCADE)
+    __configuration_group = ["group"]
+
     mac_address = models.CharField(max_length=17,
                                    unique=True,
                                    db_index=True,
@@ -346,3 +360,11 @@ class Device(AbstractDevice2, BackendedModelMixin):
         if dict:
             return config
         return json.dumps(config, **kwargs)
+
+
+django_x509.models.Ca.add_to_class(
+    'group', models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
+                               on_delete=models.CASCADE))
+
+django_x509.models.Ca.__configuration_group = ["group"]
+django_x509.models.Cert.__configuration_group = ["ca", "group"]

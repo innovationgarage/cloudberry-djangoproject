@@ -32,6 +32,7 @@ class ConfigAdmin(BaseAdmin):
     verbose_name_plural = _('Device configuration details')
     readonly_fields = []
     fields = ['name',
+              'group',
               'backend',
               'config',
               'created',
@@ -52,6 +53,7 @@ class DeviceAdmin(AbstractDeviceAdmin):
     list_select_related = ()
     readonly_fields = ['id_hex', 'get_config_list']
     fields = ['name',
+              'group',
               'mac_address',
               'id_hex',
               'key',
