@@ -108,7 +108,7 @@
                         "mask": 24,
                         "gateway": "",
                         "address": {
-                            "$": "@template().lan.network"
+                            "$": "@template().lan.ipaddress"
                         }
                     }
                 ],
