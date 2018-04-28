@@ -27,73 +27,23 @@ from django.utils.functional import lazy
 from django.conf import settings
 import django_x509.models
 import django_admin_ownership.models
+import cloudberry_app.fields
+import cloudberry_app.transform
 
-class BackendedModelMixin(object):
-    schema_prefix = "/cloudberry_app/schema"
-    
-    @classmethod
-    def get_backends(cls, schema_prefix=None):
-        if schema_prefix is None:
-            schema_prefix = cls.schema_prefix
-        schema_prefix = settings.ROOT + schema_prefix
-        for item in app_settings.BACKENDS:
-            yield ("%s/backend/%s" % (schema_prefix, item[0]), item[1])
-        try:
-            for backend in Backend.objects.all():
-                yield ("%s/dynamic/%s" % (schema_prefix, backend.id), backend.name)    
-        except:
-            return
-
-    def get_url(self, schema_prefix = None):
-        return "%s/dynamic/%s" % (settings.ROOT + (schema_prefix or self.schema_prefix), self.id)
-
-    def get_context(self):
-        return getattr(self, 'context', {})
-
-    def get_templates(self):
-        return []
-
-    def backend_class(self, **kwargs):
-        schema_prefix = settings.ROOT + self.schema_prefix
-        if self.backend.startswith("%s/dynamic/" % schema_prefix):
-            backend = Backend.objects.get(id=self.backend.split("/")[-1])
-            backend.init_backend(**kwargs)
-        elif self.backend.startswith("%s/backend/" % schema_prefix):
-            backend_cls = import_string(self.backend.split("/")[-1])
-            backend = backend_cls(**kwargs)
-        else:
-            raise Exception("Unknown backend path %s in %s" % (self.backend, type(self)))
-        return backend
-    
-class TemplatedBackend(cloudberry_app.backends.TemplatedBackend):
-    def __init__(self, *arg, **kw):
-        pass
-
-    init_backend = cloudberry_app.backends.TemplatedBackend.__init__
-
-class DynamicTextListField(models.CharField):
-    @property
-    def choices(self):
-        return self.choices_fn()
-    @choices.setter
-    def choices(self, value):
-        pass
-    def choices_fn(self):
-        return []
-    
-class Backend(BaseModel, BackendedModelMixin, TemplatedBackend):
+class Backend(BaseModel, cloudberry_app.backends.BackendedModelMixin, cloudberry_app.backends.TemplatedBackendModelMixin):
     group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
                                on_delete=models.CASCADE)
     __configuration_group = ["group"]
 
     schema_prefix = "/cloudberry_app/schema/transform"
 
-    backend = DynamicTextListField(_('backend'),
-                                   blank=True,
-                                   max_length=128,
-                                   help_text=_('Select <a href="http://netjsonconfig.openwisp.org/en/'
-                                               'stable/" target="_blank">netjsonconfig</a> backend'))
-    backend.choices_fn = (lambda schema_prefix: (lambda: BackendedModelMixin.get_backends(schema_prefix)))(schema_prefix)
+    backend = cloudberry_app.fields.DynamicTextListField(
+        _('backend'),
+        blank=True,
+        max_length=128,
+        help_text=_('Select <a href="http://netjsonconfig.openwisp.org/en/'
+                    'stable/" target="_blank">netjsonconfig</a> backend'))
+    backend.choices_fn = (lambda schema_prefix: (lambda: cloudberry_app.backends.BackendedModelMixin.get_backends(schema_prefix)))(schema_prefix)
     
     schema = JSONField(_('schema'),
                        default=dict,
@@ -161,7 +111,7 @@ class Backend(BaseModel, BackendedModelMixin, TemplatedBackend):
                 for fk in self.extract_foreign_keys(value, model):
                     yield fk
                     
-class Config(BackendedModelMixin, BaseConfig):
+class Config(cloudberry_app.backends.BackendedModelMixin, BaseConfig):
     group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
                                on_delete=models.CASCADE)
     __configuration_group = ["group"]
@@ -174,12 +124,13 @@ class Config(BackendedModelMixin, BaseConfig):
 
     device = None
     
-    backend = DynamicTextListField(_('backend'),
-                                   blank=True,
-                                   max_length=128,
-                                   help_text=_('Select <a href="http://netjsonconfig.openwisp.org/en/'
-                                               'stable/" target="_blank">netjsonconfig</a> backend'))
-    backend.choices_fn = lambda: BackendedModelMixin.get_backends()
+    backend = cloudberry_app.fields.DynamicTextListField(
+        _('backend'),
+        blank=True,
+        max_length=128,
+        help_text=_('Select <a href="http://netjsonconfig.openwisp.org/en/'
+                    'stable/" target="_blank">netjsonconfig</a> backend'))
+    backend.choices_fn = lambda: cloudberry_app.backends.BackendedModelMixin.get_backends()
 
     def get_lowest_backend_instance(self, context):
         context = dict(context)
@@ -215,74 +166,8 @@ class AbstractDevice2(AbstractDevice):
     class Meta(AbstractDevice.Meta):
         abstract = True
 
-def model_to_dict(model):
-    def mangle(value):
-        if isinstance(value, (bool, type(None), str, int, float)):
-            return value
-        elif isinstance(value, models.Model):
-            return {'model': "%s.%s" % (value._meta.app_label, value._meta.model_name),
-                    'id': str(value.id)}
-        elif hasattr(value, 'items'):
-            return type(value)({item_name: mangle(item_value)
-                                for item_name, item_value in value.items()})
-        elif hasattr(value, '__iter__'):
-            return type(value)(mangle(item_value)
-                               for item_value in value)
-        else:
-            return str(value)
-    return {f.name: mangle(getattr(model, f.name))
-            for f in model._meta.fields}    
         
-class FkLookup(object):
-    def __getitem__(self, name):
-        return FkLookupModel(name)
-
-    def __contains__(self, name):
-        try:
-            FkLookupModel(name)
-            return True
-        except:
-            return False
-
-    def items(self):
-        return []
-
-    def values(self):
-        return []
-    
-    def __repr__(self):
-        return 'FkLookup'
-    
-class FkLookupModel(object):
-    def __init__(self, model):
-        self.model_name = model
-        try:
-            self.model = django.apps.apps.get_registered_model(*model.split("."))
-        except:
-            raise Exception("Unable to get registered model %s" % model)
-
-    def __contains__(self, id):
-        return self.model.objects.filter(id=id).count() > 0
-        
-    def __getitem__(self, id):
-        try:
-            return model_to_dict(self.model.objects.get(id=id))
-        except Exception as e:
-            raise Exception("%s.objects.get(id=%s): %s" % (self.model_name, repr(id), e))
-
-    def items(self):
-        for model in self.model.objects.all():
-            yield (model.id, model_to_dict(model))
-
-    def values(self):
-        for model in self.model.objects.all():
-            yield model_to_dict(model)
-            
-    def __repr__(self):
-        return self.model_name
-
-        
-class Device(AbstractDevice2, BackendedModelMixin):
+class Device(AbstractDevice2, cloudberry_app.backends.BackendedModelMixin):
     group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
                                on_delete=models.CASCADE)
     __configuration_group = ["group"]
@@ -331,8 +216,8 @@ class Device(AbstractDevice2, BackendedModelMixin):
             for c in self.referred_in_configs.all()]
     
     def get_context(self):
-        return {'device': model_to_dict(self),
-                'fk': FkLookup()}
+        return {'device': cloudberry_app.transform.model_to_dict(self),
+                'fk': cloudberry_app.transform.FkLookup()}
     
     # The controller expects a single config object with the
     # methods defined below, so we synthesize it...
