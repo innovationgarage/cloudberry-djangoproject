@@ -57,10 +57,11 @@ class BackendedModelMixin(object):
         schema_prefix = settings.ROOT + schema_prefix
         for item in app_settings.BACKENDS:
             yield ("%s/backend/%s" % (schema_prefix, item[0]), item[1])
+        import cloudberry_app.models
         try:
-            for backend in Backend.objects.all():
+            for backend in cloudberry_app.models.Backend.objects.all():
                 yield ("%s/dynamic/%s" % (schema_prefix, backend.id), backend.name)    
-        except:
+        except Exception as e:
             return
 
     def get_url(self, schema_prefix = None):

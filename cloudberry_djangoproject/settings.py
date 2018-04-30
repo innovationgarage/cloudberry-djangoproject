@@ -31,7 +31,6 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
-    'django_admin_ownership',
     # extendnetjson: Dependency for django_netjsonconfig that needs to
     # be before 'admin'
     'openwisp_utils.admin_theme',
@@ -44,6 +43,7 @@ INSTALLED_APPS = [
     # extendnetjson: Dependencies for django_netjsonconfig
     'sortedm2m',
     'reversion',
+    'django_admin_ownership.apps.DjangoAdminOwnershipConfig',
     # extendnetjson: This app could be extended the same way as
     # django_netjsonconfig. This has however not been done in this
     # project.

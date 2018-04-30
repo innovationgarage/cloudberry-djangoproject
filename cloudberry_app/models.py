@@ -33,7 +33,7 @@ import cloudberry_app.transform
 class Backend(BaseModel, cloudberry_app.backends.BackendedModelMixin, cloudberry_app.backends.TemplatedBackendModelMixin):
     group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
                                on_delete=models.CASCADE)
-    __configuration_group = ["group"]
+    _configuration_group = ["group"]
 
     schema_prefix = "/cloudberry_app/schema/transform"
 
@@ -114,7 +114,7 @@ class Backend(BaseModel, cloudberry_app.backends.BackendedModelMixin, cloudberry
 class Config(cloudberry_app.backends.BackendedModelMixin, BaseConfig):
     group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
                                on_delete=models.CASCADE)
-    __configuration_group = ["group"]
+    _configuration_group = ["group"]
 
     class Meta(BaseConfig.Meta):
         abstract = False
@@ -170,7 +170,7 @@ class AbstractDevice2(AbstractDevice):
 class Device(AbstractDevice2, cloudberry_app.backends.BackendedModelMixin):
     group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
                                on_delete=models.CASCADE)
-    __configuration_group = ["group"]
+    _configuration_group = ["group"]
 
     mac_address = models.CharField(max_length=17,
                                    unique=True,
@@ -251,5 +251,5 @@ django_x509.models.Ca.add_to_class(
     'group', models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
                                on_delete=models.CASCADE))
 
-django_x509.models.Ca.__configuration_group = ["group"]
-django_x509.models.Cert.__configuration_group = ["ca", "group"]
+django_x509.models.Ca._configuration_group = ["group"]
+django_x509.models.Cert._configuration_group = ["ca", "group"]
