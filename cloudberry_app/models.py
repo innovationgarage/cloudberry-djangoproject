@@ -29,6 +29,7 @@ import django_x509.models
 import django_admin_ownership.models
 import cloudberry_app.fields
 import cloudberry_app.transform
+import django_global_request.middleware
 
 class Backend(BaseModel, cloudberry_app.backends.BackendedModelMixin, cloudberry_app.backends.TemplatedBackendModelMixin):
     group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
@@ -66,7 +67,10 @@ class Backend(BaseModel, cloudberry_app.backends.BackendedModelMixin, cloudberry
         def add_foreign_key(model, title):
             app_label, cls = model.rsplit(".", 1)
             model_cls = django.apps.apps.get_registered_model(app_label, cls)
-            instances = model_cls.objects.all().order_by(title)
+            instances = model_cls.objects_allowed_to(
+                model_cls.objects.all(),
+                read=django_global_request.middleware.get_request().user
+            ).order_by(title)
             titles = [getattr(instance, title) for instance in instances]
             values = [{'model': model, 'id': str(instance.id)}
                       for instance in instances]

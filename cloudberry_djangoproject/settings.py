@@ -31,6 +31,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'django_global_request',
     # extendnetjson: Dependency for django_netjsonconfig that needs to
     # be before 'admin'
     'openwisp_utils.admin_theme',
@@ -61,6 +62,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django_global_request.middleware.GlobalRequestMiddleware',
 ]
 
 ROOT_URLCONF = 'cloudberry_djangoproject.urls'
