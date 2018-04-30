@@ -4,9 +4,12 @@ from __future__ import unicode_literals
 from django.db import models
 
 class ConfigurationGroup(models.Model):
+    _configuration_group = ['group']
+    
     name = models.CharField(max_length=64,
                             unique=True,
                             db_index=True)
+    group = models.ForeignKey('ConfigurationGroup', blank=True, null=True, on_delete='cascade')
     read = models.ManyToManyField('auth.Group', related_name="read_devices", blank=True)
     write = models.ManyToManyField('auth.Group', related_name="write_devices", blank=True)
 

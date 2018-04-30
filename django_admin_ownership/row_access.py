@@ -59,17 +59,21 @@ def row_access(Model, admin):
         return True
 
     @patch(Model)
-    def allowed_to_change(self, user):
+    def allowed_to_change(self, orig, user):
         if user.is_superuser: return True
         obj1 = getattr(self, Model._configuration_group[0])
         return obj1.objects_allowed_to(type(obj1).objects.filter(id=obj1.id), write=user, prefix=1).count() > 0
 
     @patch(Model)
-    def allowed_to_read(self, user):
+    def allowed_to_read(self, orig, user):
         if user.is_superuser: return True
         obj1 = getattr(self, Model._configuration_group[0])
         return obj1.objects_allowed_to(type(obj1).objects.filter(id=obj1.id), read=user, prefix=1).count() > 0
 
+    @patch(AdminModel)
+    def has_module_permission(self, orig, request):
+        return self._has_change_permission(request) or self.has_view_permission(request) or self.has_delete_permission(request)
+        
     @patch(AdminModel)
     def _has_change_permission(self, orig, request, obj=None):
         if obj is None: return True
