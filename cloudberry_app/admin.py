@@ -10,6 +10,10 @@ import sakform
 import django.contrib
 import django.shortcuts
 import django.utils.html
+import import_export.admin
+import import_export.resources
+import import_export.formats.base_formats
+import django.forms.models
 
 from django_netjsonconfig.base.admin import (AbstractConfigForm,
                                              AbstractConfigInline,
@@ -27,8 +31,16 @@ class ConfigForm(AbstractConfigForm):
                                                          "display_required_only": True
                                                      })})}
 
+class ConfigResource(import_export.resources.ModelResource):
+    class Meta:
+        model = Config
 
-class ConfigAdmin(BaseAdmin):
+    def dehydrate_config(self, config):
+        return config.config
+        
+class ConfigAdmin(import_export.admin.ImportExportMixin, import_export.admin.ImportExportActionModelAdmin, BaseAdmin):
+    formats=(import_export.formats.base_formats.JSON,)
+    resource_class = ConfigResource
     verbose_name_plural = _('Device configuration details')
     readonly_fields = []
     fields = ['name',
@@ -46,7 +58,13 @@ class ConfigAdmin(BaseAdmin):
     form = ConfigForm
     extra = 0
     
-class DeviceAdmin(AbstractDeviceAdmin):
+class DeviceResource(import_export.resources.ModelResource):
+    class Meta:
+        model = Device
+        
+class DeviceAdmin(import_export.admin.ImportExportMixin, import_export.admin.ImportExportActionModelAdmin, AbstractDeviceAdmin):
+    formats=(import_export.formats.base_formats.JSON,)
+    resource_class = DeviceResource
     inlines = []
     list_display =  AbstractDeviceAdmin.list_display + ['get_config_list']
     list_filter = ['created']
@@ -64,8 +82,6 @@ class DeviceAdmin(AbstractDeviceAdmin):
               'created',
               'modified',
               'get_config_list']
-
-import django.forms.models
 
 class PreviewWidget(django.forms.widgets.Select):
     input_type = 'select'
@@ -108,7 +124,19 @@ class BackendForm(BaseForm):
             #                                      })})
         }
 
-class BackendAdmin(BaseAdmin):
+class BackendResource(import_export.resources.ModelResource):
+    class Meta:
+        model = Backend
+
+    def dehydrate_schema(self, backend):
+        return backend.schema
+
+    def dehydrate_transform(self, backend):
+        return backend.transform
+        
+class BackendAdmin(import_export.admin.ImportExportMixin, import_export.admin.ImportExportActionModelAdmin, BaseAdmin):
+    formats=(import_export.formats.base_formats.JSON,)
+    resource_class = BackendResource
     model = Backend
     form = BackendForm
 
