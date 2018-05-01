@@ -3,6 +3,37 @@ from __future__ import unicode_literals
 
 from django.db import models
 
+try:
+    import django_global_request.middleware
+    def get_current_user():
+        return django_global_request.middleware.get_request().user
+except:
+    def get_current_user():
+        return None
+    
+class GroupedConfigurationMixin(object):
+    def get_default_group(self, user):
+        user = user or get_current_user()
+        groups = ConfigurationGroup.objects.all()
+        if user.is_superuser:
+            groups = groups.filter(group = None)
+        else:
+            groups = groups.filter(write__user = user)
+        if len(groups):
+            return groups[0]
+        return None
+
+    def save(self, *arg, **kw):
+        field_name = self._configuration_group[0]        
+        is_none = getattr(self, field_name, None) is None
+        blank = getattr(type(self), field_name).field.blank
+        user = get_current_user()
+        is_superuser = user and user.is_superuser
+        if is_none and (not blank
+                        or not is_superuser):
+            setattr(self, field_name, self.get_default_group(user))
+        super().save(*arg, **kw)
+
 class ConfigurationGroup(models.Model):
     _configuration_group = ['group']
     

@@ -21,6 +21,11 @@ from django_netjsonconfig.base.admin import (AbstractConfigForm,
                                              BaseForm,
                                              BaseAdmin)
 
+
+class JSON_FORMAT(import_export.formats.base_formats.JSON):
+    def export_data(self, dataset, **kwargs):
+        return json.dumps(dataset.dict, indent=2)
+
 class ConfigForm(AbstractConfigForm):
     class Meta(AbstractConfigForm.Meta):
         model = Config
@@ -34,12 +39,13 @@ class ConfigForm(AbstractConfigForm):
 class ConfigResource(import_export.resources.ModelResource):
     class Meta:
         model = Config
-
+        exclude = ("group",)
+        
     def dehydrate_config(self, config):
         return config.config
         
 class ConfigAdmin(import_export.admin.ImportExportMixin, import_export.admin.ImportExportActionModelAdmin, BaseAdmin):
-    formats=(import_export.formats.base_formats.JSON,)
+    formats=(JSON_FORMAT,)
     resource_class = ConfigResource
     verbose_name_plural = _('Device configuration details')
     readonly_fields = []
@@ -61,9 +67,10 @@ class ConfigAdmin(import_export.admin.ImportExportMixin, import_export.admin.Imp
 class DeviceResource(import_export.resources.ModelResource):
     class Meta:
         model = Device
-        
+        exclude = ("group",)
+         
 class DeviceAdmin(import_export.admin.ImportExportMixin, import_export.admin.ImportExportActionModelAdmin, AbstractDeviceAdmin):
-    formats=(import_export.formats.base_formats.JSON,)
+    formats=(JSON_FORMAT,)
     resource_class = DeviceResource
     inlines = []
     list_display =  AbstractDeviceAdmin.list_display + ['get_config_list']
@@ -127,7 +134,8 @@ class BackendForm(BaseForm):
 class BackendResource(import_export.resources.ModelResource):
     class Meta:
         model = Backend
-
+        exclude = ("group",)
+ 
     def dehydrate_schema(self, backend):
         return backend.schema
 
@@ -135,7 +143,7 @@ class BackendResource(import_export.resources.ModelResource):
         return backend.transform
         
 class BackendAdmin(import_export.admin.ImportExportMixin, import_export.admin.ImportExportActionModelAdmin, BaseAdmin):
-    formats=(import_export.formats.base_formats.JSON,)
+    formats=(JSON_FORMAT,)
     resource_class = BackendResource
     model = Backend
     form = BackendForm

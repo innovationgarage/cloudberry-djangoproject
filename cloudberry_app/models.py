@@ -31,7 +31,7 @@ import cloudberry_app.fields
 import cloudberry_app.transform
 import django_global_request.middleware
 
-class Backend(BaseModel, cloudberry_app.backends.BackendedModelMixin, cloudberry_app.backends.TemplatedBackendModelMixin):
+class Backend(django_admin_ownership.models.GroupedConfigurationMixin, BaseModel, cloudberry_app.backends.BackendedModelMixin, cloudberry_app.backends.TemplatedBackendModelMixin):
     group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
                                on_delete=models.CASCADE)
     _configuration_group = ["group"]
