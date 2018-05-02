@@ -13,6 +13,7 @@ import django.utils.html
 import django.forms.models
 import cloudberry_app.importexport
 import import_export.admin
+import reversion
 
 from django_netjsonconfig.base.admin import (AbstractConfigForm,
                                              AbstractConfigInline,
@@ -31,7 +32,10 @@ class ConfigForm(AbstractConfigForm):
                                                          "display_required_only": True
                                                      })})}
 
-class ConfigAdmin(import_export.admin.ImportExportMixin, import_export.admin.ImportExportActionModelAdmin, BaseAdmin):
+class ConfigAdmin(import_export.admin.ImportExportMixin,
+                  import_export.admin.ImportExportActionModelAdmin,
+                  BaseAdmin,
+                  reversion.admin.VersionAdmin):
     formats=(cloudberry_app.importexport.JSON_FORMAT,)
     resource_class = cloudberry_app.importexport.ConfigResource
     verbose_name_plural = _('Device configuration details')
@@ -51,7 +55,10 @@ class ConfigAdmin(import_export.admin.ImportExportMixin, import_export.admin.Imp
     form = ConfigForm
     extra = 0
             
-class DeviceAdmin(import_export.admin.ImportExportMixin, import_export.admin.ImportExportActionModelAdmin, AbstractDeviceAdmin):
+class DeviceAdmin(import_export.admin.ImportExportMixin,
+                  import_export.admin.ImportExportActionModelAdmin,
+                  AbstractDeviceAdmin,
+                  reversion.admin.VersionAdmin):
     formats=(cloudberry_app.importexport.JSON_FORMAT,)
     resource_class = cloudberry_app.importexport.DeviceResource
     inlines = []
@@ -113,7 +120,10 @@ class BackendForm(BaseForm):
             #                                      })})
         }
         
-class BackendAdmin(import_export.admin.ImportExportMixin, import_export.admin.ImportExportActionModelAdmin, BaseAdmin):
+class BackendAdmin(import_export.admin.ImportExportMixin,
+                   import_export.admin.ImportExportActionModelAdmin,
+                   BaseAdmin,
+                   reversion.admin.VersionAdmin):
     formats=(cloudberry_app.importexport.JSON_FORMAT,)
     resource_class = cloudberry_app.importexport.BackendResource
     model = Backend
