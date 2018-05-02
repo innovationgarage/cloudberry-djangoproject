@@ -31,6 +31,7 @@ import cloudberry_app.fields
 import cloudberry_app.transform
 import django_global_request.middleware
 import tablib
+import django.urls
 
 class Backend(django_admin_ownership.models.GroupedConfigurationMixin, BaseModel, cloudberry_app.backends.BackendedModelMixin, cloudberry_app.backends.TemplatedBackendModelMixin):
     group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
@@ -223,22 +224,22 @@ class Device(django_admin_ownership.models.GroupedConfigurationMixin, AbstractDe
     def get_context(self):
         return {'device': cloudberry_app.transform.model_to_dict(self),
                 'fk': cloudberry_app.transform.FkLookup()}
+
+    def get_absolute_url(self):
+        return "%s?key=%s" % (django.urls.reverse('controller:download_config', kwargs={'pk': self.id}), self.key)
     
     # The controller expects a single config object with the
     # methods defined below, so we synthesize it...
 
-    def _has_config(self):
-        return False
-
-    def get_default_templates(self):
-        return []
-    
     @property
     def config(self):
         return self
 
-    def generate(self):
-        return self.get_backend_instance().generate()
+    def _has_config(self):
+        return True
+
+    def get_default_templates(self):
+        return []
 
     @property
     def checksum(self):

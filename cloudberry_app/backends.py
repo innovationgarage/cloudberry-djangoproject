@@ -7,7 +7,21 @@ import json
 from django.conf import settings
 import django_netjsonconfig.settings as app_settings
 
-class TemplatedBackend(BaseBackend):
+class BackendedMixin(object):
+    def get_backend_instance(self):
+        return self.backend_class(
+            config=self.get_config(),
+            templates=self.get_templates(),
+            context=self.get_context())
+
+    def render(self, *arg, **kw):
+        return self.get_backend_instance().render(*arg, **kw)
+        
+    def generate(self, *arg, **kw):
+        return self.get_backend_instance().generate(*arg, **kw)
+
+
+class TemplatedBackend(BaseBackend, BackendedMixin):
     backend_class = netjsonconfig.OpenWrt
     schema = {}
     transform = {}
@@ -28,17 +42,6 @@ class TemplatedBackend(BaseBackend):
     def get_templates(self):
         return self.templates
 
-    def get_backend_instance(self):
-        return self.backend_class(
-            config=self.get_config(),
-            templates=self.get_templates(),
-            context=self.get_context())
-
-    def render(self, *arg, **kw):
-        return self.get_backend_instance().render(*arg, **kw)
-        
-    def generate(self, *arg, **kw):
-        return self.get_backend_instance().generate(*arg, **kw)
 
 class TemplatedBackendModelMixin(TemplatedBackend):
     def __init__(self, *arg, **kw):
@@ -47,7 +50,7 @@ class TemplatedBackendModelMixin(TemplatedBackend):
     init_backend = TemplatedBackend.__init__
     
 
-class BackendedModelMixin(object):
+class BackendedModelMixin(BackendedMixin):
     schema_prefix = "/cloudberry_app/schema"
     
     @classmethod
