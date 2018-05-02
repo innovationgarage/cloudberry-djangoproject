@@ -8,7 +8,7 @@ from django.conf import settings
 import django_netjsonconfig.settings as app_settings
 
 class BackendedMixin(object):
-    def get_backend_instance(self):
+    def get_backend_instance(self, template_instances=None):
         return self.backend_class(
             config=self.get_config(),
             templates=self.get_templates(),
@@ -89,3 +89,5 @@ class BackendedModelMixin(BackendedMixin):
             raise Exception("Unknown backend path %s in %s" % (self.backend, type(self)))
         return backend
     
+    def clean_netjsonconfig_backend(self, backend):
+        pass

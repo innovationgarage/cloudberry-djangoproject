@@ -224,9 +224,6 @@ class Device(django_admin_ownership.models.GroupedConfigurationMixin, AbstractDe
     def get_context(self):
         return {'device': cloudberry_app.transform.model_to_dict(self),
                 'fk': cloudberry_app.transform.FkLookup()}
-
-    def get_absolute_url(self):
-        return "%s?key=%s" % (django.urls.reverse('controller:download_config', kwargs={'pk': self.id}), self.key)
     
     # The controller expects a single config object with the
     # methods defined below, so we synthesize it...

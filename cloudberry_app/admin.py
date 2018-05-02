@@ -54,11 +54,15 @@ class ConfigAdmin(import_export.admin.ImportExportMixin,
     
     form = ConfigForm
     extra = 0
-            
+
+#id_config_jsoneditor
+
+    
 class DeviceAdmin(import_export.admin.ImportExportMixin,
                   import_export.admin.ImportExportActionModelAdmin,
                   AbstractDeviceAdmin,
                   reversion.admin.VersionAdmin):
+    change_form_template = 'cloudberry_app/device_admin.html'
     formats=(cloudberry_app.importexport.JSON_FORMAT,)
     resource_class = cloudberry_app.importexport.DeviceResource
     inlines = []
