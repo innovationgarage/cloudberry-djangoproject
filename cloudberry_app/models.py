@@ -30,6 +30,7 @@ import django_admin_ownership.models
 import cloudberry_app.fields
 import cloudberry_app.transform
 import django_global_request.middleware
+import tablib
 
 class Backend(django_admin_ownership.models.GroupedConfigurationMixin, BaseModel, cloudberry_app.backends.BackendedModelMixin, cloudberry_app.backends.TemplatedBackendModelMixin):
     group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
@@ -115,7 +116,7 @@ class Backend(django_admin_ownership.models.GroupedConfigurationMixin, BaseModel
                 for fk in self.extract_foreign_keys(value, model):
                     yield fk
                     
-class Config(cloudberry_app.backends.BackendedModelMixin, BaseConfig):
+class Config(django_admin_ownership.models.GroupedConfigurationMixin, cloudberry_app.backends.BackendedModelMixin, BaseConfig):
     group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
                                on_delete=models.CASCADE)
     _configuration_group = ["group"]
@@ -147,7 +148,7 @@ class Config(cloudberry_app.backends.BackendedModelMixin, BaseConfig):
         return obj
     
     def save(self, *arg, **kw):
-        BaseConfig.save(self, *arg, **kw)
+        super().save(*arg, **kw)
 
         backend = self.get_backend_instance()
         if hasattr(backend, "extract_foreign_keys"):
@@ -171,7 +172,7 @@ class AbstractDevice2(AbstractDevice):
         abstract = True
 
         
-class Device(AbstractDevice2, cloudberry_app.backends.BackendedModelMixin):
+class Device(django_admin_ownership.models.GroupedConfigurationMixin, AbstractDevice2, cloudberry_app.backends.BackendedModelMixin):
     group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
                                on_delete=models.CASCADE)
     _configuration_group = ["group"]

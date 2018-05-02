@@ -12,6 +12,8 @@ import django.shortcuts
 import django.utils.html
 import import_export.admin
 import import_export.resources
+import import_export.fields
+import import_export.widgets
 import import_export.formats.base_formats
 import django.forms.models
 
@@ -36,6 +38,30 @@ class ConfigForm(AbstractConfigForm):
                                                          "display_required_only": True
                                                      })})}
 
+
+class InlinedManyToManyWidget(import_export.widgets.ManyToManyWidget):
+    def __init__(self, resource=None, model=None, *args, **kwargs):
+        self.resource = resource
+        if resource and not model:
+            model = resource.Meta.model
+        super(InlinedManyToManyWidget, self).__init__(model, *args, **kwargs)
+
+    def clean(self, value, row=None, *args, **kwargs):
+        dataset = tablib.Dataset()
+        dataset.dict = value
+        res = self.resource().import_data(dataset)
+        return [row.object_id for row in res.rows]
+
+    def render(self, value, obj=None):
+        return self.resource().export(value.all()).dict
+
+    
+
+class DeviceResource(import_export.resources.ModelResource):
+    class Meta:
+        model = Device
+        exclude = ("group",)
+
 class ConfigResource(import_export.resources.ModelResource):
     class Meta:
         model = Config
@@ -43,7 +69,13 @@ class ConfigResource(import_export.resources.ModelResource):
         
     def dehydrate_config(self, config):
         return config.config
-        
+
+    refers_devices = import_export.fields.Field(attribute='refers_devices', widget=InlinedManyToManyWidget(DeviceResource))
+ConfigResource.fields['refers_configs'] = import_export.fields.Field(column_name='refers_configs', attribute='refers_configs', widget=InlinedManyToManyWidget(ConfigResource))
+
+    # def dehydrate_refers_devices(self, config):
+    #     return DeviceResource().export(config.refers_devices.all()).dict
+
 class ConfigAdmin(import_export.admin.ImportExportMixin, import_export.admin.ImportExportActionModelAdmin, BaseAdmin):
     formats=(JSON_FORMAT,)
     resource_class = ConfigResource
@@ -63,12 +95,7 @@ class ConfigAdmin(import_export.admin.ImportExportMixin, import_export.admin.Imp
     
     form = ConfigForm
     extra = 0
-    
-class DeviceResource(import_export.resources.ModelResource):
-    class Meta:
-        model = Device
-        exclude = ("group",)
-         
+            
 class DeviceAdmin(import_export.admin.ImportExportMixin, import_export.admin.ImportExportActionModelAdmin, AbstractDeviceAdmin):
     formats=(JSON_FORMAT,)
     resource_class = DeviceResource
