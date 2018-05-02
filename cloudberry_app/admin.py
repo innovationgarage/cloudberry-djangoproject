@@ -10,12 +10,9 @@ import sakform
 import django.contrib
 import django.shortcuts
 import django.utils.html
-import import_export.admin
-import import_export.resources
-import import_export.fields
-import import_export.widgets
-import import_export.formats.base_formats
 import django.forms.models
+import cloudberry_app.importexport
+import import_export.admin
 
 from django_netjsonconfig.base.admin import (AbstractConfigForm,
                                              AbstractConfigInline,
@@ -23,10 +20,6 @@ from django_netjsonconfig.base.admin import (AbstractConfigForm,
                                              BaseForm,
                                              BaseAdmin)
 
-
-class JSON_FORMAT(import_export.formats.base_formats.JSON):
-    def export_data(self, dataset, **kwargs):
-        return json.dumps(dataset.dict, indent=2)
 
 class ConfigForm(AbstractConfigForm):
     class Meta(AbstractConfigForm.Meta):
@@ -38,47 +31,9 @@ class ConfigForm(AbstractConfigForm):
                                                          "display_required_only": True
                                                      })})}
 
-
-class InlinedManyToManyWidget(import_export.widgets.ManyToManyWidget):
-    def __init__(self, resource=None, model=None, *args, **kwargs):
-        self.resource = resource
-        if resource and not model:
-            model = resource.Meta.model
-        super(InlinedManyToManyWidget, self).__init__(model, *args, **kwargs)
-
-    def clean(self, value, row=None, *args, **kwargs):
-        dataset = tablib.Dataset()
-        dataset.dict = value
-        res = self.resource().import_data(dataset)
-        return [row.object_id for row in res.rows]
-
-    def render(self, value, obj=None):
-        return self.resource().export(value.all()).dict
-
-    
-
-class DeviceResource(import_export.resources.ModelResource):
-    class Meta:
-        model = Device
-        exclude = ("group",)
-
-class ConfigResource(import_export.resources.ModelResource):
-    class Meta:
-        model = Config
-        exclude = ("group",)
-        
-    def dehydrate_config(self, config):
-        return config.config
-
-    refers_devices = import_export.fields.Field(attribute='refers_devices', widget=InlinedManyToManyWidget(DeviceResource))
-ConfigResource.fields['refers_configs'] = import_export.fields.Field(column_name='refers_configs', attribute='refers_configs', widget=InlinedManyToManyWidget(ConfigResource))
-
-    # def dehydrate_refers_devices(self, config):
-    #     return DeviceResource().export(config.refers_devices.all()).dict
-
 class ConfigAdmin(import_export.admin.ImportExportMixin, import_export.admin.ImportExportActionModelAdmin, BaseAdmin):
-    formats=(JSON_FORMAT,)
-    resource_class = ConfigResource
+    formats=(cloudberry_app.importexport.JSON_FORMAT,)
+    resource_class = cloudberry_app.importexport.ConfigResource
     verbose_name_plural = _('Device configuration details')
     readonly_fields = []
     fields = ['name',
@@ -97,8 +52,8 @@ class ConfigAdmin(import_export.admin.ImportExportMixin, import_export.admin.Imp
     extra = 0
             
 class DeviceAdmin(import_export.admin.ImportExportMixin, import_export.admin.ImportExportActionModelAdmin, AbstractDeviceAdmin):
-    formats=(JSON_FORMAT,)
-    resource_class = DeviceResource
+    formats=(cloudberry_app.importexport.JSON_FORMAT,)
+    resource_class = cloudberry_app.importexport.DeviceResource
     inlines = []
     list_display =  AbstractDeviceAdmin.list_display + ['get_config_list']
     list_filter = ['created']
@@ -157,21 +112,10 @@ class BackendForm(BaseForm):
             #                                          "display_required_only": True
             #                                      })})
         }
-
-class BackendResource(import_export.resources.ModelResource):
-    class Meta:
-        model = Backend
-        exclude = ("group",)
- 
-    def dehydrate_schema(self, backend):
-        return backend.schema
-
-    def dehydrate_transform(self, backend):
-        return backend.transform
         
 class BackendAdmin(import_export.admin.ImportExportMixin, import_export.admin.ImportExportActionModelAdmin, BaseAdmin):
-    formats=(JSON_FORMAT,)
-    resource_class = BackendResource
+    formats=(cloudberry_app.importexport.JSON_FORMAT,)
+    resource_class = cloudberry_app.importexport.BackendResource
     model = Backend
     form = BackendForm
 
