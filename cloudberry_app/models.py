@@ -160,7 +160,11 @@ class Config(django_admin_ownership.models.GroupedConfigurationMixin, cloudberry
 
             for config in backend.extract_foreign_keys(self.config, 'cloudberry_app.Config'):
                 self.refers_configs.add(config)
-    
+
+    def get_device_list(self):
+        return ", ".join([c.name for c in self.refers_devices.all()])
+    get_device_list.short_description = "Devices"
+                
 class AbstractDevice2(AbstractDevice):
     # This whole class is a hack, to be able to override a @property
     # from AbstractDevice with a django CharField
