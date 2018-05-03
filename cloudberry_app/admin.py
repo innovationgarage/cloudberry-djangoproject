@@ -26,11 +26,12 @@ class ConfigForm(AbstractConfigForm):
     class Meta(AbstractConfigForm.Meta):
         model = Config
         widgets = {'config': JsonSchemaWidget(attrs={'data-options': json.dumps({
-                                                         "theme": 'bootstrap2',
-                                                         "disable_collapse": False,
-                                                         "disable_edit_json": False,
-                                                         "display_required_only": True
-                                                     })})}
+            "theme": 'bootstrap2',
+            "iconlib": "fontawesome4",
+            "disable_collapse": False,
+            "disable_edit_json": False,
+            "display_required_only": True
+        })})}
 
 class ConfigAdmin(import_export.admin.ImportExportMixin,
                   import_export.admin.ImportExportActionModelAdmin,

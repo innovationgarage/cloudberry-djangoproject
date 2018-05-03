@@ -19,6 +19,7 @@ class JsonSchemaWidget(AdminTextareaWidget):
               static('cloudberry_app/js/widget.js')]
         css = {'all': [#static('django-netjsonconfig/css/lib/jsonschema-ui.css'),
                        #static('django-netjsonconfig/css/lib/advanced-mode.css'),
+                       static('cloudberry_app/css/font-awesome/css/font-awesome.min.css'),
                        static('cloudberry_app/css/json-editor.css'),
                        static('cloudberry_app/css/bootstrap-combined.min.css')]}
         return forms.Media(js=js, css=css)
