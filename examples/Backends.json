@@ -2,7 +2,7 @@
   {
     "id": "4560bc02-d7d7-405e-9fd8-95f61f8d39c2",
     "created": "2018-03-22 12:46:22",
-    "modified": "2018-05-02 16:37:27",
+    "modified": "2018-05-03 12:08:45",
     "name": "CloudberryVPN",
     "backend": "/cloudberry_app/schema/transform/backend/cloudberry_netjson.OpenWrt",
     "schema": {
@@ -108,7 +108,7 @@
             "autostart": true
           }
         ],
-        "$": "$.config.server[@.device.id is $.context.device.id]",
+        "$": "$.config.server[@.device is $.context.device.pk]",
         "forwarding": [
           {
             "src": "lan",
@@ -190,7 +190,7 @@
                 "$": "'iroute ' + @template().lan.network + ' ' + @template().lan.netmask"
               },
               "path": {
-                "$": "'/etc/openvpn/ccd/' + @template().device.id"
+                "$": "'/etc/openvpn/ccd/' + $.context.fk[@template().device].id"
               }
             }
           ],
@@ -198,21 +198,21 @@
             {
               "mode": "0644",
               "contents": {
-                "$": "$.context.fk['django_x509.Ca'][$.context.fk['django_x509.Cert'][@template().certificate.id].ca.id].certificate"
+                "$": "$.context.fk[$.context.fk[@template().certificate].ca].certificate"
               },
               "path": "/etc/ssl/ca.pem"
             },
             {
               "mode": "0644",
               "contents": {
-                "$": "$.context.fk['django_x509.Cert'][@template().certificate.id].certificate"
+                "$": "$.context.fk[@template().certificate].certificate"
               },
               "path": "/etc/ssl/cert.pem"
             },
             {
               "mode": "0644",
               "contents": {
-                "$": "$.context.fk['django_x509.Cert'][@template().certificate.id].private_key"
+                "$": "$.context.fk[@template().certificate].private_key"
               },
               "path": "/etc/ssl/cert.key.pem"
             },
@@ -297,7 +297,7 @@
             "autostart": true
           }
         ],
-        "$": "$.config.clients.*[@.device.id is $.context.device.id]",
+        "$": "$.config.clients.*[@.device is $.context.device.pk]",
         "forwarding": [
           {
             "src": "vpn",
@@ -376,21 +376,21 @@
           {
             "mode": "0644",
             "contents": {
-              "$": "$.context.fk['django_x509.Ca'][$.context.fk['django_x509.Cert'][@template().certificate.id].ca.id].certificate"
+              "$": "$.context.fk[$.context.fk[@template().certificate].ca].certificate"
             },
             "path": "/etc/ssl/ca.pem"
           },
           {
             "mode": "0644",
             "contents": {
-              "$": "$.context.fk['django_x509.Cert'][@template().certificate.id].certificate"
+              "$": "$.context.fk[@template().certificate].certificate"
             },
             "path": "/etc/ssl/cert.pem"
           },
           {
             "mode": "0644",
             "contents": {
-              "$": "$.context.fk['django_x509.Cert'][@template().certificate.id].private_key"
+              "$": "$.context.fk[@template().certificate].private_key"
             },
             "path": "/etc/ssl/cert.key.pem"
           }
@@ -436,7 +436,7 @@
   {
     "id": "30e867c0-2c74-41ca-afc8-2e9fdd93460e",
     "created": "2018-05-02 16:38:32",
-    "modified": "2018-05-02 16:38:32",
+    "modified": "2018-05-03 12:11:13",
     "name": "CloudberryVPNDockerManager",
     "backend": "/cloudberry_app/schema/transform/backend/cloudberry_netjson.OpenWrt",
     "schema": {
@@ -449,12 +449,12 @@
     "transform": {
       "containers": [
         {
-          "$": "$.context.fk['cloudberry_app.Config'][$.context.referred_in_configs.*.id]",
+          "$": "$.context.fk[$.context.referred_in_configs.*]",
           "uuid": {
-            "$": "@template().config.server.device.id"
+            "$": "$.context.fk[@template().config.server.device].id"
           },
           "key": {
-            "$": "$.context.fk['cloudberry_app.Device'][@template().config.server.device.id].key"
+            "$": "$.context.fk[@template().config.server.device].key"
           },
           "ports": [
             {

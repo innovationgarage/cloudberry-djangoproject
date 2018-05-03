@@ -6,8 +6,7 @@ def model_to_dict(model):
         if isinstance(value, (bool, type(None), str, int, float)):
             return value
         elif isinstance(value, django.db.models.Model):
-            return {'model': "%s.%s" % (value._meta.app_label, value._meta.model_name),
-                    'id': str(value.id)}
+            return "fk://%s/%s" % (value._meta.label, value.id)
         elif hasattr(value, 'items'):
             return type(value)({item_name: mangle(item_value)
                                 for item_name, item_value in value.items()})
@@ -16,23 +15,37 @@ def model_to_dict(model):
                                for item_value in value)
         else:
             return str(value)
-    return {f.name: mangle(getattr(model, f.name))
-            for f in model._meta.fields}    
-        
+    res = {f.name: mangle(getattr(model, f.name))
+           for f in model._meta.fields}
+    res['pk'] = "fk://%s/%s" % (model._meta.label, model.id)
+    return res
+
 class FkLookup(object):
     def __getitem__(self, name):
-        return FkLookupModel(name)
-
+        if "://" in name:
+            name = name.split("://")[1]
+        if '/' in name:
+            name, id = name.split("/")
+            return FkLookupModel(name)[id]
+        else:
+            return FkLookupModel(name)
+        
     def __contains__(self, name):
-        try:
-            FkLookupModel(name)
-            return True
-        except:
-            return False
+        if "://" in name:
+            name = name.split("://")[1]
+        if '/' in name:
+            name, id = name.split("/")
+            return id in FkLookupModel(name)
+        else:
+            try:
+                FkLookupModel(name)
+                return True
+            except:
+                return False            
 
     def items(self):
         return []
-
+        
     def values(self):
         return []
     

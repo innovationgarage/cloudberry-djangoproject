@@ -74,12 +74,12 @@ class Backend(django_admin_ownership.models.GroupedConfigurationMixin, BaseModel
                 read=django_global_request.middleware.get_request().user
             ).order_by(title)
             titles = [getattr(instance, title) for instance in instances]
-            values = [{'model': model, 'id': str(instance.id)}
+            values = ["fk://%s/%s" % (model, instance.id)
                       for instance in instances]
             if values:
                 schema['definitions']['fk__%s' % model.replace(".", "_")] = {
                     'title': cls,
-                    'type': 'object',
+                    'type': 'string',
                     'options': {'enum_titles': titles},
                     'enum': values
                 }
@@ -105,14 +105,14 @@ class Backend(django_admin_ownership.models.GroupedConfigurationMixin, BaseModel
             raise ValidationError(e)
 
     def extract_foreign_keys(self, config, model):
-        if isinstance(config, (dict, collections.OrderedDict)):
-            if config.get('model') == model:
-                yield config.get('id')
-                return
+        if isinstance(config, str):
+            if config.startswith("fk://%s" % model):
+                yield config.split("/")[-1]
+        elif isinstance(config, (dict, collections.OrderedDict)):
             for key, value in config.items():
                 for fk in self.extract_foreign_keys(value, model):
                     yield fk
-        if isinstance(config, (list, tuple)):
+        elif isinstance(config, (list, tuple)):
             for value in config:
                 for fk in self.extract_foreign_keys(value, model):
                     yield fk
@@ -140,7 +140,7 @@ class Config(django_admin_ownership.models.GroupedConfigurationMixin, cloudberry
 
     def get_lowest_backend_instance(self, context):
         context = dict(context)
-        context['referred_in_configs'] = [{'model': 'cloudberry_app.Config', 'id': str(instance.id)}
+        context['referred_in_configs'] = ["fk://cloudberry_app.Config/%s" % instance.id
                                           for instance in self.referred_in_configs.all()]
         self.context = context
         obj = self.get_backend_instance()
@@ -160,7 +160,11 @@ class Config(django_admin_ownership.models.GroupedConfigurationMixin, cloudberry
 
             for config in backend.extract_foreign_keys(self.config, 'cloudberry_app.Config'):
                 self.refers_configs.add(config)
-    
+
+    def get_device_list(self):
+        return ", ".join([c.name for c in self.refers_devices.all()])
+    get_device_list.short_description = "Devices"
+                
 class AbstractDevice2(AbstractDevice):
     # This whole class is a hack, to be able to override a @property
     # from AbstractDevice with a django CharField

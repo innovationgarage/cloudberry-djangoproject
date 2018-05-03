@@ -37,16 +37,26 @@ class ConfigAdmin(import_export.admin.ImportExportMixin,
                   import_export.admin.ImportExportActionModelAdmin,
                   BaseAdmin,
                   reversion.admin.VersionAdmin):
+    change_form_template = 'cloudberry_app/change_form.html'
     formats=(cloudberry_app.importexport.JSON_FORMAT,)
     resource_class = cloudberry_app.importexport.ConfigResource
     verbose_name_plural = _('Device configuration details')
-    readonly_fields = []
-    fields = ['name',
-              'group',
-              'backend',
-              'config',
-              'created',
-              'modified']
+    readonly_fields = ['get_device_list']
+    list_display =  ['name', 'backend', 'created', 'modified', 'get_device_list']
+    fieldsets = (
+        (None, {
+            'classes': ('model-info',),
+            'fields': ['created',
+                       'modified',
+                       'get_device_list']
+        }),
+        (None, {
+            'fields': ['name',
+                       'group',
+                       'backend',
+                       'config']
+        })
+    )
     change_select_related = ()
 
     def get_queryset(self, request):
@@ -71,18 +81,26 @@ class DeviceAdmin(import_export.admin.ImportExportMixin,
     list_filter = ['created']
     list_select_related = ()
     readonly_fields = ['id_hex', 'get_config_list']
-    fields = ['name',
-              'group',
-              'mac_address',
-              'id_hex',
-              'key',
-              'backend',
-              'model',
-              'os',
-              'system',
-              'created',
-              'modified',
-              'get_config_list']
+    fields = None
+    fieldsets = (
+        (None, {
+            'classes': ('model-info',),
+            'fields': ['created',
+                       'modified',
+                       'get_config_list']
+        }),
+        (None, {
+            'fields': ['name',
+                       'group',
+                       'mac_address',
+                       'id_hex',
+                       'key',
+                       'backend',
+                       'model',
+                       'os',
+                       'system']
+        })
+    )
 
 class PreviewWidget(django.forms.widgets.Select):
     input_type = 'select'
@@ -129,11 +147,29 @@ class BackendAdmin(import_export.admin.ImportExportMixin,
                    import_export.admin.ImportExportActionModelAdmin,
                    BaseAdmin,
                    reversion.admin.VersionAdmin):
+    change_form_template = 'cloudberry_app/change_form.html'
     formats=(cloudberry_app.importexport.JSON_FORMAT,)
     resource_class = cloudberry_app.importexport.BackendResource
     model = Backend
     form = BackendForm
 
+    fieldsets = (
+        (None, {
+            'classes': ('model-info',),
+            'fields': ['created',
+                       'modified']
+        }),
+        (None, {
+            'fields': ['name',
+                       'group',
+                       'backend',
+                       'schema',
+                       'transform',
+                       'preview_config']
+        })
+    )
+
+    
     def preview(self, request, object_id=None):        
         if object_id is None:
             obj = None
@@ -156,8 +192,16 @@ class BackendAdmin(import_export.admin.ImportExportMixin,
         obj.transform = json.loads(form['transform'].value())
         obj.config = config.config
         obj.context = device.get_context()
-        backend = obj.get_backend_instance()
 
+        try:
+            backend = obj.get_backend_instance()
+        except Exception as e:
+            django.contrib.messages.add_message(
+                request,
+                django.contrib.messages.WARNING,
+                e)
+            return
+        
         try:
             backend.validate()
         except Exception as e:
