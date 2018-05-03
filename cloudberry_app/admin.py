@@ -156,8 +156,16 @@ class BackendAdmin(import_export.admin.ImportExportMixin,
         obj.transform = json.loads(form['transform'].value())
         obj.config = config.config
         obj.context = device.get_context()
-        backend = obj.get_backend_instance()
 
+        try:
+            backend = obj.get_backend_instance()
+        except Exception as e:
+            django.contrib.messages.add_message(
+                request,
+                django.contrib.messages.WARNING,
+                e)
+            return
+        
         try:
             backend.validate()
         except Exception as e:

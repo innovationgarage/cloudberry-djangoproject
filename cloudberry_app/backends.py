@@ -32,9 +32,12 @@ class TemplatedBackend(BaseBackend, BackendedMixin):
         BaseBackend.__init__(self, config, native)
 
     def get_config(self):
-        return sakform.transform(
+        res = sakform.transform(
             {"config": self.config, "context": self.get_context()},
-            self.transform)[0]
+            self.transform)
+        if not res:
+            raise Exception("Transform returned an empty queryset")
+        return res[0]
     
     def get_context(self):
         return self.context
