@@ -1,0 +1,472 @@
+[
+  {
+    "id": "4560bc02-d7d7-405e-9fd8-95f61f8d39c2",
+    "created": "2018-03-22 12:46:22",
+    "modified": "2018-05-02 16:37:27",
+    "name": "CloudberryVPN",
+    "backend": "/cloudberry_app/schema/transform/backend/cloudberry_netjson.OpenWrt",
+    "schema": {
+      "definitions": {
+        "server": {
+          "properties": {
+            "certificate": {
+              "$ref": "#/definitions/fk__django_x509_Cert"
+            },
+            "hostname": {
+              "type": "string"
+            },
+            "port": {
+              "type": "integer"
+            },
+            "device": {
+              "$ref": "#/definitions/fk__cloudberry_app_Device"
+            },
+            "docker-manager": {
+              "$ref": "#/definitions/fk__cloudberry_app_Config"
+            }
+          },
+          "required": [
+            "hostname",
+            "port",
+            "certificate",
+            "device"
+          ]
+        },
+        "client": {
+          "type": "object",
+          "properties": {
+            "certificate": {
+              "$ref": "#/definitions/fk__django_x509_Cert"
+            },
+            "lan": {
+              "properties": {
+                "network": {
+                  "type": "string"
+                },
+                "netmask": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "network",
+                "netmask"
+              ]
+            },
+            "device": {
+              "$ref": "#/definitions/fk__cloudberry_app_Device"
+            }
+          },
+          "required": [
+            "lan",
+            "certificate",
+            "device"
+          ]
+        }
+      },
+      "properties": {
+        "server": {
+          "$ref": "#/definitions/server"
+        },
+        "clients": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/client"
+          }
+        }
+      },
+      "required": [
+        "server",
+        "clients"
+      ]
+    },
+    "transform": {
+      "server": {
+        "general": {
+          "description": {
+            "$": "'Cloudberry VPN server ' + $.context.device.id"
+          }
+        },
+        "interfaces": [
+          {
+            "network": "vpn",
+            "type": "other",
+            "addresses": [],
+            "mac": "",
+            "name": "tun0",
+            "mtu": 1500,
+            "disabled": false,
+            "autostart": false
+          },
+          {
+            "network": "lan",
+            "type": "ethernet",
+            "addresses": [],
+            "mac": "",
+            "name": "eth0",
+            "mtu": 1500,
+            "disabled": false,
+            "autostart": true
+          }
+        ],
+        "$": "$.config.server[@.device.id is $.context.device.id]",
+        "forwarding": [
+          {
+            "src": "lan",
+            "dest": "vpn"
+          },
+          {
+            "src": "vpn",
+            "dest": "lan"
+          }
+        ],
+        "openvpn": [
+          {
+            "down": "",
+            "secret": "",
+            "client_cert_not_required": false,
+            "up": "",
+            "mtu_test": false,
+            "persist_key": true,
+            "push": [
+              {
+                "$": "$.config.clients.*.lan",
+                "route": {
+                  "$": "'route ' + @template().network + ' ' + @template().netmask"
+                },
+                "_": {
+                  "$": "@template().route"
+                }
+              }
+            ],
+            "username_as_common_name": false,
+            "script_security": 1,
+            "mute": 0,
+            "proto": "tcp-server",
+            "up_delay": 0,
+            "mode": "server",
+            "log": "",
+            "cipher": "BF-CBC",
+            "topology": "p2p",
+            "persist_tun": true,
+            "crl_verify": "",
+            "tls_server": true,
+            "server": "10.8.0.0 255.255.255.0",
+            "group": "",
+            "duplicate_cn": false,
+            "name": "myvpn",
+            "tun_ipv6": false,
+            "comp_lzo": "adaptive",
+            "mssfix": 1450,
+            "keepalive": "",
+            "local": "",
+            "engine": "",
+            "client_to_client": true,
+            "auth": "SHA1",
+            "dh": "/etc/ssl/dh.pem",
+            "client_config_dir": "/etc/openvpn/ccd",
+            "cert": "/etc/ssl/cert.pem",
+            "dev": "tun0",
+            "disabled": false,
+            "key": "/etc/ssl/cert.key.pem",
+            "status": "",
+            "fragment": 0,
+            "status_version": 1,
+            "auth_user_pass_verify": "",
+            "verb": 3,
+            "port": 1194,
+            "user": "",
+            "dev_type": "tun",
+            "mute_replay_warnings": false,
+            "ca": "/etc/ssl/ca.pem",
+            "fast_io": false
+          }
+        ],
+        "files": {
+          "ccds": [
+            {
+              "mode": "0644",
+              "$": "$.config.clients.*",
+              "contents": {
+                "$": "'iroute ' + @template().lan.network + ' ' + @template().lan.netmask"
+              },
+              "path": {
+                "$": "'/etc/openvpn/ccd/' + @template().device.id"
+              }
+            }
+          ],
+          "certs": [
+            {
+              "mode": "0644",
+              "contents": {
+                "$": "$.context.fk['django_x509.Ca'][$.context.fk['django_x509.Cert'][@template().certificate.id].ca.id].certificate"
+              },
+              "path": "/etc/ssl/ca.pem"
+            },
+            {
+              "mode": "0644",
+              "contents": {
+                "$": "$.context.fk['django_x509.Cert'][@template().certificate.id].certificate"
+              },
+              "path": "/etc/ssl/cert.pem"
+            },
+            {
+              "mode": "0644",
+              "contents": {
+                "$": "$.context.fk['django_x509.Cert'][@template().certificate.id].private_key"
+              },
+              "path": "/etc/ssl/cert.key.pem"
+            },
+            {
+              "mode": "0644",
+              "contents": "WHERE DO WE GET THIS????",
+              "path": "/etc/ssl/dh.pem"
+            }
+          ],
+          "_": {
+            "$": "[@template().*.*]"
+          }
+        },
+        "zones": [
+          {
+            "forward": "ACCEPT",
+            "input": "ACCEPT",
+            "output": "ACCEPT",
+            "device": "tun0",
+            "name": "vpn"
+          },
+          {
+            "forward": "ACCEPT",
+            "output": "ACCEPT",
+            "masq": "1",
+            "name": "lan",
+            "device": "eth0",
+            "input": "ACCEPT"
+          }
+        ]
+      },
+      "clients": {
+        "general": {
+          "description": {
+            "$": "'Cloudberry VPN client ' + $.context.device.id"
+          }
+        },
+        "interfaces": [
+          {
+            "network": "vpn",
+            "type": "other",
+            "addresses": [],
+            "mac": "",
+            "name": "tun0",
+            "mtu": 1500,
+            "disabled": false,
+            "autostart": false
+          },
+          {
+            "network": "lan",
+            "type": "ethernet",
+            "addresses": [
+              {
+                "address": {
+                  "$": "@template().lan.network"
+                },
+                "mask": 24,
+                "family": "ipv4",
+                "gateway": "",
+                "proto": "static"
+              }
+            ],
+            "mac": "",
+            "name": "eth1",
+            "mtu": 1500,
+            "disabled": false,
+            "autostart": true
+          },
+          {
+            "network": "wan",
+            "type": "ethernet",
+            "addresses": [
+              {
+                "family": "ipv4",
+                "proto": "dhcp"
+              }
+            ],
+            "mac": "",
+            "name": "eth0",
+            "mtu": 1500,
+            "disabled": false,
+            "autostart": true
+          }
+        ],
+        "$": "$.config.clients.*[@.device.id is $.context.device.id]",
+        "forwarding": [
+          {
+            "src": "vpn",
+            "dest": "lan"
+          },
+          {
+            "src": "lan",
+            "dest": "vpn"
+          },
+          {
+            "src": "wan",
+            "dest": "lan"
+          },
+          {
+            "src": "lan",
+            "dest": "wan"
+          }
+        ],
+        "openvpn": [
+          {
+            "fragment": 0,
+            "mssfix": 1450,
+            "keepalive": "",
+            "local": "",
+            "down": "",
+            "auth": "SHA1",
+            "secret": "",
+            "mtu_test": false,
+            "auth_user_pass": "",
+            "persist_key": true,
+            "engine": "",
+            "dev": "tun0",
+            "script_security": 1,
+            "mode": "p2p",
+            "disabled": false,
+            "key": "/etc/ssl/cert.key.pem",
+            "mute": 0,
+            "proto": "tcp-client",
+            "up_delay": 0,
+            "comp_lzo": "yes",
+            "log": "",
+            "status_version": 1,
+            "remote": [
+              {
+                "host": {
+                  "$": "$.config.server.hostname"
+                },
+                "port": {
+                  "$": "$.config.server.port"
+                }
+              }
+            ],
+            "cipher": "AES-128-CBC",
+            "verb": 3,
+            "up": "",
+            "status": "",
+            "port": 1194,
+            "cert": "/etc/ssl/cert.pem",
+            "group": "",
+            "user": "",
+            "dev_type": "tun",
+            "resolv_retry": "infinite",
+            "name": "cloudberry",
+            "pull": true,
+            "mute_replay_warnings": false,
+            "ns_cert_type": "server",
+            "ca": "/etc/ssl/ca.pem",
+            "fast_io": false,
+            "nobind": true,
+            "persist_tun": true,
+            "tls_client": true,
+            "tun_ipv6": false
+          }
+        ],
+        "files": [
+          {
+            "mode": "0644",
+            "contents": {
+              "$": "$.context.fk['django_x509.Ca'][$.context.fk['django_x509.Cert'][@template().certificate.id].ca.id].certificate"
+            },
+            "path": "/etc/ssl/ca.pem"
+          },
+          {
+            "mode": "0644",
+            "contents": {
+              "$": "$.context.fk['django_x509.Cert'][@template().certificate.id].certificate"
+            },
+            "path": "/etc/ssl/cert.pem"
+          },
+          {
+            "mode": "0644",
+            "contents": {
+              "$": "$.context.fk['django_x509.Cert'][@template().certificate.id].private_key"
+            },
+            "path": "/etc/ssl/cert.key.pem"
+          }
+        ],
+        "zones": [
+          {
+            "forward": "ACCEPT",
+            "network": [
+              "vpn"
+            ],
+            "masq": "1",
+            "name": "vpn",
+            "output": "ACCEPT",
+            "input": "ACCEPT"
+          },
+          {
+            "forward": "ACCEPT",
+            "network": [
+              "lan"
+            ],
+            "masq": "0",
+            "name": "lan",
+            "output": "ACCEPT",
+            "input": "ACCEPT"
+          },
+          {
+            "forward": "ACCEPT",
+            "network": [
+              "wan"
+            ],
+            "masq": "1",
+            "name": "wan",
+            "output": "ACCEPT",
+            "input": "ACCEPT"
+          }
+        ]
+      },
+      "_": {
+        "$": "@template().*"
+      }
+    }
+  },
+  {
+    "id": "30e867c0-2c74-41ca-afc8-2e9fdd93460e",
+    "created": "2018-05-02 16:38:32",
+    "modified": "2018-05-02 16:38:32",
+    "name": "CloudberryVPNDockerManager",
+    "backend": "/cloudberry_app/schema/transform/backend/cloudberry_netjson.OpenWrt",
+    "schema": {
+      "properties": {
+        "device": {
+          "$ref": "#/definitions/fk__cloudberry_app_Device"
+        }
+      }
+    },
+    "transform": {
+      "containers": [
+        {
+          "$": "$.context.fk['cloudberry_app.Config'][$.context.referred_in_configs.*.id]",
+          "uuid": {
+            "$": "@template().config.server.device.id"
+          },
+          "key": {
+            "$": "$.context.fk['cloudberry_app.Device'][@template().config.server.device.id].key"
+          },
+          "ports": [
+            {
+              "proto": "tcp",
+              "guest": 1194,
+              "host": {
+                "$": "@template().config.server.port"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  }
+]
