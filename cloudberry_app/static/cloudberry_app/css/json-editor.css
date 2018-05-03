@@ -1,3 +1,19 @@
+.jsoneditor-wrapper h2 {
+  display: none;
+}
+
+.jsoneditor-wrapper h3 {
+  margin: 0;
+}
+
+.jsoneditor-wrapper .aligned label {
+  width: auto;
+}
+
+.jsoneditor-wrapper .controls {
+  display: inline-block;
+}
+
 .aligned label.checkbox {
   min-height: 20px;
   padding-left: 20px;
