@@ -1,5 +1,7 @@
 # Cloudberry djangoproject
 
+[![Build Status](http://build.innovationgarage.tech/buildStatus/icon?job=innovationgarage/cloudberry-djangoproject/master)](http://build.innovationgarage.tech/job/innovationgarage/job/cloudberry-djangoproject/job/master/)
+
 This django project is an extension on top of https://github.com/openwisp/django-netjsonconfig that provides a radically different configuration and templating system:
 
 * Multiple devices can be configured together in a single configuration that refers to the devices for various roles (e.g. server, clients, different types of clients...)
