@@ -13,6 +13,9 @@ This django project is an extension on top of https://github.com/openwisp/django
     python3 manage.py migrate
     python3 manage.py collectstatic
     python3 manage.py createsuperuser
+    
+    python manage.py import_file --model-name cloudberry_app.Backend examples/Backends.json
+
     ln -s \
       /srv/www/cloudberry-djangoproject/cloudberry-djangoproject.conf \
       /etc/apache2/mods-enabled/cloudberry-djangoproject.conf

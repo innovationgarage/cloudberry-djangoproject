@@ -6,7 +6,8 @@ from django.db import models
 try:
     import django_global_request.middleware
     def get_current_user():
-        return django_global_request.middleware.get_request().user
+        request = django_global_request.middleware.get_request()
+        return request and request.user
 except:
     def get_current_user():
         return None
@@ -14,8 +15,9 @@ except:
 class GroupedConfigurationMixin(object):
     def get_default_group(self, user):
         user = user or get_current_user()
+        is_superuser = user and user.is_superuser
         groups = ConfigurationGroup.objects.all()
-        if user.is_superuser:
+        if is_superuser:
             groups = groups.filter(group = None)
         else:
             groups = groups.filter(write__user = user)

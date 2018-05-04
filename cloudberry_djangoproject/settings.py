@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     'import_export',
+    'django_import_export_cli',
     'django_global_request',
     # extendnetjson: Dependency for django_netjsonconfig that needs to
     # be before 'admin'

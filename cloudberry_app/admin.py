@@ -13,6 +13,7 @@ import django.utils.html
 import django.forms.models
 import cloudberry_app.importexport
 import import_export.admin
+import cloudberry_import_export
 import reversion
 
 from django_netjsonconfig.base.admin import (AbstractConfigForm,
@@ -38,7 +39,7 @@ class ConfigAdmin(import_export.admin.ImportExportMixin,
                   BaseAdmin,
                   reversion.admin.VersionAdmin):
     change_form_template = 'cloudberry_app/change_form.html'
-    formats=(cloudberry_app.importexport.JSON_FORMAT,)
+    formats=(cloudberry_import_export.JSON_FORMAT,)
     resource_class = cloudberry_app.importexport.ConfigResource
     verbose_name_plural = _('Device configuration details')
     readonly_fields = ['get_device_list']
@@ -74,7 +75,7 @@ class DeviceAdmin(import_export.admin.ImportExportMixin,
                   AbstractDeviceAdmin,
                   reversion.admin.VersionAdmin):
     change_form_template = 'cloudberry_app/device_admin.html'
-    formats=(cloudberry_app.importexport.JSON_FORMAT,)
+    formats=(cloudberry_import_export.JSON_FORMAT,)
     resource_class = cloudberry_app.importexport.DeviceResource
     inlines = []
     list_display =  AbstractDeviceAdmin.list_display + ['get_config_list']
@@ -148,7 +149,7 @@ class BackendAdmin(import_export.admin.ImportExportMixin,
                    BaseAdmin,
                    reversion.admin.VersionAdmin):
     change_form_template = 'cloudberry_app/change_form.html'
-    formats=(cloudberry_app.importexport.JSON_FORMAT,)
+    formats=(cloudberry_import_export.JSON_FORMAT,)
     resource_class = cloudberry_app.importexport.BackendResource
     model = Backend
     form = BackendForm
