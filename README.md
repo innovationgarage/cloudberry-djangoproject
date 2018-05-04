@@ -5,7 +5,7 @@ This django project is an extension on top of https://github.com/openwisp/django
 * Multiple devices can be configured together in a single configuration that refers to the devices for various roles (e.g. server, clients, different types of clients...)
 * Configuration can be arbitrarily abstracted using transformations written in the [SakForm](https://github.com/innovationgarage/sakstig) JSON templating language
 * Configuration can optionally refer to other resources using drop-downs (e.g. certificates, CA:s)
-​
+
 # Installation
 
     apt install -y apache2 libapache2-mod-wsgi-py3 python3 python3-pip
