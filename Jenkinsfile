@@ -9,12 +9,12 @@ pipeline {
     stages {
       stage ('Install dependencies') {
         steps {
-            sh './setup-jenkins.sh install-depends'
+            sh 'make install-depends'
         }
       }
       stage ('Perform database migration') {
         steps {
-            sh './setup-jenkins.sh migrate'
+            sh 'make migrate'
         }
       }
       // TODO: run the server
