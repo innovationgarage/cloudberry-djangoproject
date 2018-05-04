@@ -11,3 +11,6 @@ migrate:
 
 createsuperuser:
 	python3 manage.py createsuperuser
+
+jenkins:
+	./setup-jenkins.sh
