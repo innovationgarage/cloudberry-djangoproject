@@ -1,3 +1,10 @@
+ifndef VIRTUAL_ENV
+env/bin/activate:
+	virtualenv env -p python3
+$(MAKECMDGOALS): env/bin/activate
+	. env/bin/activate; $(MAKE) $(MAKECMDGOALS)
+else
+
 dev: install-depends migrate
 	python3 manage.py runserver
 
@@ -12,5 +19,12 @@ migrate:
 createsuperuser:
 	python3 manage.py createsuperuser
 
+defaultdata:
+	python manage.py import_file --resource-class django_admin_ownership.importexport.GroupResource examples/Groups.json
+	python manage.py import_file --resource-class django_admin_ownership.importexport.ConfigurationGroupResource examples/ConfigurationGroups.json
+	python manage.py import_file --resource-class cloudberry_app.importexport.BackendResource examples/Backends.json
+
 jenkins:
 	./setup-jenkins.sh
+
+endif
