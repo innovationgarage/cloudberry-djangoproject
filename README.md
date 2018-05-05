@@ -26,3 +26,7 @@ This django project is an extension on top of https://github.com/openwisp/django
     chown -R www-data:www-data .
     /etc/init.d/apache2 restart
 
+## See also
+
+* [docker-manager](https://github.com/innovationgarage/cloudberry-docker-manager) - OpenWISP front-end to docker
+* [lede-openwisp-docker](https://github.com/innovationgarage/cloudberry-lede-openwisp-docker) - OpenWISP docker image
