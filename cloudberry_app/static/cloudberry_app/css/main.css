@@ -11,3 +11,14 @@
 .model-info .form-row {
   border: none;
 }
+
+.button.json-editor-button {
+    padding: 10px 15px;
+}
+
+ul.nav li {
+  margin-left: 0;
+  list-style: none;
+  font-size: 14px;
+  line-height: 20px;
+}
