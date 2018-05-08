@@ -3,7 +3,7 @@
     oldWidth = 0;
 
     var setupTabs = function(el) {
-        var tabs = $(el).closest(".tab-content").parent().find(".nav-tabs");
+        var tabs = $(el).closest(".tab-parent").find(".nav-tabs");
         var tab_contents = $(el).closest(".tab-content");
 
         tabs.find(".json-editor-tab").remove();
