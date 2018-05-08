@@ -14,7 +14,7 @@
         }).map(function (idx, item) {
             item = $(item);
             var title = item.find("> h3 > span").text();
-            var content = item.find("> .well");
+            var content = item.closest('.row-fluid');
             var id = item.attr("data-schemapath").replace('.', '-');
             var tab = $('<li class="nav-item json-editor-tab"></li>');
             tab.append('<a class="nav-link" id="json-editor-tab-' + id +
@@ -23,7 +23,16 @@
                        '" aria-selected="true">' + title +
                        '</a>');
             tabs.append(tab);
-            var tab_content_wrapper = $('<div class="tab-pane" id="json-editor-' +id + '" role="tabpanel" aria-labelledby="' + id + '-tab"><div>');
+
+            var header = content.find("> .span12 > h3");
+            header.remove();
+            content.prepend(header);
+
+            header.addClass("json-editor-top-header");
+            header.find("span").css({display: "none"});
+            header.find(".json-editor-btn-collapse").css({display: "none"});
+
+            var tab_content_wrapper = $('<div class="tab-pane json-editor-tab-pane" id="json-editor-' +id + '" role="tabpanel" aria-labelledby="' + id + '-tab"><div>');
             content.remove();
             tab_content_wrapper.append(content);
             tab_contents.append(tab_content_wrapper);            
@@ -31,6 +40,13 @@
         $("*[data-schemapath='root'] .well").css({display: 'none'});
         $("*[data-schemapath='root'] .json-editor-btn-collapse").css({display: 'none'});
     };
+
+    var setupModals = function (el) {
+        var modals = $(el).find(".json-editor-edit-json-modal");
+        $("body > .json-editor-modal").remove();
+        modals.remove();
+        $("body").append(modals);
+    }
     
     var loadUi = function(el, schema, setInitialValue){
         var field = $(el),
@@ -75,6 +91,7 @@
         if (field.attr("data-options") !== undefined) {
           $.extend(options, JSON.parse(field.attr("data-options")));
         }
+
         editor = new JSONEditor(document.getElementById(id), options);
         getEditorValue = function(){
             return JSON.stringify(editor.getValue(), null, 4);
@@ -103,7 +120,8 @@
             }
         });
 
-        setupTabs(el);
+        setupModals(editorContainer);
+        setupTabs(editorContainer);
     };
 
     var loadUiAndSchema = function(el, schema, setInitialValue){
@@ -157,9 +175,25 @@ var matchKey = (function () {
     if (elem.oMatchesSelector) { return 'oMatchesSelector'; }
 }());
 
+
+var origJSONObjectEditor = JSONEditor.defaults.editors.object;
+JSONEditor.defaults.editors.object = JSONEditor.defaults.editors.object.extend({
+  build: function () {
+      origJSONObjectEditor.prototype.build.apply(this, arguments);
+      $(this.editjson_holder).addClass('json-editor-edit-json-modal');
+      $(this.addproperty_holder).addClass('json-editor-add-property-modal');
+  }
+});
+
 // JSON-Schema Edtor django theme
 JSONEditor.defaults.themes.django = JSONEditor.defaults.themes.bootstrap2.extend({
     getButtonHolder: function() {
       return JSONEditor.defaults.themes.bootstrap2.prototype.getButtonHolder.apply(this, arguments);
-    }
+    },
+    getModal: function() {
+      var el = document.createElement('div');
+      el.className = 'json-editor-modal';
+      el.style.display = 'none';
+      return el;
+    }    
 });
