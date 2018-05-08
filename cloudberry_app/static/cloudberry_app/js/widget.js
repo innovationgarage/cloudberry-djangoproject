@@ -63,7 +63,7 @@
         // inject editor unless already present
         if(!editorContainer.length){
             html =  '<div class="jsoneditor-wrapper">';
-            html += '<fieldset class="module aligned"><h2>'+ labelText +'</h2>';
+            html += '<fieldset class="module aligned"><label class="required" for="' +  id + '">'+ labelText +'</label>';
             html += '<div id="'+ id +'" class="jsoneditor"></div></fieldset>';
             html += '</div>';
             container.hide().after(html);
