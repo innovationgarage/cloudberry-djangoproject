@@ -2,31 +2,29 @@
     oldHeight = 0,
     oldWidth = 0;
 
-    var setupTabs = function(el) {
+    var setupTabs = function(jsoneditor, el) {
         var tabs = $(el).closest(".tab-parent").find(".nav-tabs");
         var tab_contents = $(el).closest(".tab-content");
 
         tabs.find(".json-editor-tab").remove();
-            
-        $(".span12[data-schemapath]").filter(function (idx, item) {
-            return $(item).attr("data-schemapath").split(".").length == 2;
-        }).map(function (idx, item) {
-            item = $(item);
+
+        var editors = jsoneditor.editors['root'].editors;
+        for (var key in editors) {
+            var editor = editors[key];
+            var item = $(editor.container);
             var content = item.closest('.row-fluid');
             var header = content.find("> .span12 > h3");
-            var id = item.attr("data-schemapath").replace('.', '-');
-            var title = header.find("> span").text();
-            if (!title) {
-                title = item.attr("data-schemapath").split(".")[1];
+            var id = editor.path.replace('.', '-');
+            var title = editor.getTitle();
+            if (!editor.options.hidden) {
+                var tab = $('<li class="nav-item json-editor-tab"></li>');
+                tab.append('<a class="nav-link" id="json-editor-tab-' + id +
+                           '" data-toggle="tab" href="#json-editor-' + id +
+                           '" role="tab" aria-controls="' + title +
+                           '" aria-selected="true">' + title +
+                           '</a>');
+                tabs.append(tab);
             }
-            var tab = $('<li class="nav-item json-editor-tab"></li>');
-            tab.append('<a class="nav-link" id="json-editor-tab-' + id +
-                       '" data-toggle="tab" href="#json-editor-' + id +
-                       '" role="tab" aria-controls="' + title +
-                       '" aria-selected="true">' + title +
-                       '</a>');
-            tabs.append(tab);
-
             header.addClass("json-editor-top-header");
 
             var tab_content_wrapper = $("#json-editor-" +id);
@@ -35,12 +33,12 @@
             }
             tab_content_wrapper.append(content);
             tab_contents.append(tab_content_wrapper);
-        });
+        }
         $("*[data-schemapath='root'] .well").css({display: 'none'});
         $("*[data-schemapath='root'] .json-editor-btn-collapse").css({display: 'none'});
     };
 
-    var setupModals = function (el) {
+    var setupModals = function (editor, el) {
         var modals = $(el).find(".json-editor-edit-json-modal");
         $("body").append(modals);
     }
@@ -122,8 +120,8 @@
         });
 
         editor.updateWidget = function () {
-            setupModals(editorContainer);
-            setupTabs(editorContainer);
+            setupModals(this, editorContainer);
+            setupTabs(this, editorContainer);
         };
         editor.updateWidget();
     };

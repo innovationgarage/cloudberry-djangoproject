@@ -71,6 +71,11 @@ ul.nav li {
 .json-editor-top-header {
     position: absolute;
     z-index: 10;
-    right: 40px;
+    right: -10px;
     margin-top: -20px;
+}
+
+.json-editor-top-header span,
+.json-editor-top-header .json-editor-btn-collapse {
+    display: none;
 }
