@@ -1,0 +1,24 @@
+{% extends "cloudberry_app/change_form.html" %}
+{% load i18n admin_modify %}
+
+{% block pretitle %}{% endblock %}
+{% block content_title %}{% endblock %}
+
+{% block content %}
+  <div class='tab-parent'>
+    <ul class="nav nav-tabs">
+      <li class="nav-item">
+        <a class="nav-link active" id="general-tab" data-toggle="tab" href="#general" role="tab" aria-controls="general" aria-selected="true">General</a>
+      </li>
+    </ul>
+    {{ block.super }}
+  </div>
+{% endblock %}
+
+{% block field_sets %}
+  <div class="tab-content">
+    <div class="tab-pane active" id="general" role="tabpanel" aria-labelledby="general-tab">
+      {{ block.super }}
+    </div>
+  </div>
+{% endblock %}

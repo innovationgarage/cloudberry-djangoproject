@@ -27,7 +27,7 @@ class ConfigForm(AbstractConfigForm):
     class Meta(AbstractConfigForm.Meta):
         model = Config
         widgets = {'config': JsonSchemaWidget(attrs={'data-options': json.dumps({
-            "theme": 'bootstrap2',
+            "theme": 'django',
             "iconlib": "fontawesome4",
             "disable_collapse": False,
             "disable_edit_json": False,
@@ -38,7 +38,7 @@ class ConfigAdmin(import_export.admin.ImportExportMixin,
                   import_export.admin.ImportExportActionModelAdmin,
                   BaseAdmin,
                   reversion.admin.VersionAdmin):
-    change_form_template = 'cloudberry_app/change_form.html'
+    change_form_template = 'cloudberry_app/config_admin.html'
     formats=(cloudberry_import_export.JSON_FORMAT,)
     resource_class = cloudberry_app.importexport.ConfigResource
     verbose_name_plural = _('Device configuration details')

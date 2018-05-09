@@ -16,12 +16,15 @@ class JsonSchemaWidget(AdminTextareaWidget):
         js = [#static('django-netjsonconfig/js/lib/advanced-mode.js'),
               #static('django-netjsonconfig/js/lib/tomorrow_night_bright.js'),
               static('cloudberry_app/js/libs/jsoneditor.js'),
+              static('cloudberry_app/js/libs/jquery.min.js'),
+              static('cloudberry_app/js/libs/bootstrap.min.js'),
               static('cloudberry_app/js/widget.js')]
         css = {'all': [#static('django-netjsonconfig/css/lib/jsonschema-ui.css'),
                        #static('django-netjsonconfig/css/lib/advanced-mode.css'),
                        static('cloudberry_app/css/font-awesome/css/font-awesome.min.css'),
                        static('cloudberry_app/css/json-editor.css'),
-                       static('cloudberry_app/css/bootstrap-combined.min.css')]}
+                       static('cloudberry_app/css/bootstrap-combined.min.css')
+        ]}
         return forms.Media(js=js, css=css)
 
     def render(self, name, value, attrs={}):

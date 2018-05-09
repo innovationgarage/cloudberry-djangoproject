@@ -11,3 +11,71 @@
 .model-info .form-row {
   border: none;
 }
+
+.button.json-editor-button {
+    padding: 10px 15px;
+}
+
+ul.nav li {
+  margin-left: 0;
+  list-style: none;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+#config_form > div > .tab-content {
+  overflow: visible;
+}
+
+.object-tools {
+    margin-top: -56px;
+}
+
+#general .jsoneditor h3 span {
+    display: none;
+}
+
+.json-editor-modal {
+  position: absolute;
+  z-index: 10;
+  background: white;
+  border: 1px solid black;
+  box-shadow: 3px 3px black;
+}
+
+.json-editor-modal.json-editor-edit-json-modal {
+  position: fixed;
+  left: 10px !important;
+  right: 10px !important;
+  top: 10px !important;
+  bottom: 10px !important;
+}
+
+.json-editor-edit-json-modal textarea {
+    width: 100% !important;
+    height: 100% !important;
+    border-bottom: 30px solid white;
+}
+ 
+.json-editor-edit-json-modal .btn {
+  top: -40px;
+  z-index: 10;
+  position: relative;
+}
+
+.json-editor-tab-pane > .row-fluid > .span12 {
+    margin: 0;
+}
+
+
+.json-editor-top-header {
+    position: absolute;
+    z-index: 10;
+    right: -10px;
+    margin-top: -20px;
+}
+
+.json-editor-top-header span,
+.json-editor-top-header .json-editor-btn-collapse {
+    display: none;
+}
