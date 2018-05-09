@@ -230,10 +230,29 @@ JSONEditor.defaults.editors.select = origJSONSelectEditor.extend({
             $(this.control).find(".controls").append(link);
         }
         if (this.schema.change_url || this.schema.add_url) {
-            window.updateRelatedObjectLinks(this.input);
+            updateRelatedObjectLinks(this.input);
         }
     }
 });
+
+/* Copied from /cloudberry/static/admin/js/admin/RelatedObjectLookups.js, but removes the fk://modelname/ before the __fk__ id */
+var updateRelatedObjectLinks = function(triggeringLink) {
+    var $this = $(triggeringLink);
+    var siblings = $this.nextAll('.change-related, .delete-related');
+    if (!siblings.length) {
+        return;
+    }
+    var value = $this.val();
+    if (value) {
+        value = value.split("/").pop();
+        siblings.each(function() {
+            var elm = $(this);
+            elm.attr('href', elm.attr('data-href-template').replace('__fk__', value));
+        });
+    } else {
+        siblings.removeAttr('href');
+    }
+}
 
 var origDismissAddRelatedObjectPopup = window.dismissAddRelatedObjectPopup;
 window.dismissAddRelatedObjectPopup = function dismissAddRelatedObjectPopup(win, newId, newRepr) {
