@@ -7,15 +7,18 @@
         var tab_contents = $(el).closest(".tab-content");
 
         tabs.find(".json-editor-tab").remove();
-        tab_contents.find(".json-editor-tab").remove();
             
-        $("*[data-schemapath]").filter(function (idx, item) {
+        $(".span12[data-schemapath]").filter(function (idx, item) {
             return $(item).attr("data-schemapath").split(".").length == 2;
         }).map(function (idx, item) {
             item = $(item);
-            var title = item.find("> h3 > span").text();
             var content = item.closest('.row-fluid');
+            var header = content.find("> .span12 > h3");
             var id = item.attr("data-schemapath").replace('.', '-');
+            var title = header.find("> span").text();
+            if (!title) {
+                title = item.attr("data-schemapath").split(".")[1];
+            }
             var tab = $('<li class="nav-item json-editor-tab"></li>');
             tab.append('<a class="nav-link" id="json-editor-tab-' + id +
                        '" data-toggle="tab" href="#json-editor-' + id +
@@ -24,18 +27,14 @@
                        '</a>');
             tabs.append(tab);
 
-            var header = content.find("> .span12 > h3");
-            header.remove();
-            content.prepend(header);
-
             header.addClass("json-editor-top-header");
-            header.find("span").css({display: "none"});
-            header.find(".json-editor-btn-collapse").css({display: "none"});
 
-            var tab_content_wrapper = $('<div class="tab-pane json-editor-tab-pane" id="json-editor-' +id + '" role="tabpanel" aria-labelledby="' + id + '-tab"><div>');
-            content.remove();
+            var tab_content_wrapper = $("#json-editor-" +id);
+            if (!tab_content_wrapper.length) {
+                tab_content_wrapper = $('<div class="tab-pane json-editor-tab-pane" id="json-editor-' +id + '" role="tabpanel" aria-labelledby="' + id + '-tab"><div>');
+            }
             tab_content_wrapper.append(content);
-            tab_contents.append(tab_content_wrapper);            
+            tab_contents.append(tab_content_wrapper);
         });
         $("*[data-schemapath='root'] .well").css({display: 'none'});
         $("*[data-schemapath='root'] .json-editor-btn-collapse").css({display: 'none'});
@@ -43,8 +42,6 @@
 
     var setupModals = function (el) {
         var modals = $(el).find(".json-editor-edit-json-modal");
-        $("body > .json-editor-modal").remove();
-        modals.remove();
         $("body").append(modals);
     }
     
@@ -92,6 +89,10 @@
           $.extend(options, JSON.parse(field.attr("data-options")));
         }
 
+        $(".json-editor-modal").remove();            
+        $(".json-editor-tab").remove();            
+        $("*[data-schemapath]").remove();
+        
         editor = new JSONEditor(document.getElementById(id), options);
         getEditorValue = function(){
             return JSON.stringify(editor.getValue(), null, 4);
@@ -120,8 +121,11 @@
             }
         });
 
-        setupModals(editorContainer);
-        setupTabs(editorContainer);
+        editor.updateWidget = function () {
+            setupModals(editorContainer);
+            setupTabs(editorContainer);
+        };
+        editor.updateWidget();
     };
 
     var loadUiAndSchema = function(el, schema, setInitialValue){
@@ -182,7 +186,19 @@ JSONEditor.defaults.editors.object = JSONEditor.defaults.editors.object.extend({
       origJSONObjectEditor.prototype.build.apply(this, arguments);
       $(this.editjson_holder).addClass('json-editor-edit-json-modal');
       $(this.addproperty_holder).addClass('json-editor-add-property-modal');
-  }
+  },
+  addObjectProperty: function(name, prebuild_only) {
+      origJSONObjectEditor.prototype.addObjectProperty.apply(this, arguments);
+      if (!this.parent && this.jsoneditor.updateWidget) {
+          this.jsoneditor.updateWidget();
+      }
+  },
+  removeObjectProperty: function(property) {
+      origJSONObjectEditor.prototype.removeObjectProperty.apply(this, arguments);
+      if (!this.parent && this.jsoneditor.updateWidget) {
+          this.jsoneditor.updateWidget();
+      }
+  }  
 });
 
 // JSON-Schema Edtor django theme
