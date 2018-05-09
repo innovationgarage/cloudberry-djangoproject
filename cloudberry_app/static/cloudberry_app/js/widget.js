@@ -9,6 +9,8 @@
         tabs.find(".json-editor-tab").remove();
 
         var editors = jsoneditor.editors['root'].editors;
+        if (editors.length !== undefined) return;
+            
         for (var key in editors) {
             var editor = editors[key];
             var item = $(editor.container);
