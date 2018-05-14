@@ -79,25 +79,27 @@ class DeviceAdmin(import_export.admin.ImportExportMixin,
     list_display =  AbstractDeviceAdmin.list_display + ['get_config_list']
     list_filter = ['created']
     list_select_related = ()
-    readonly_fields = ('id_hex', 'get_config_list')
+    readonly_fields = ('id_hex', 'key', 'get_config_list')
     fields = None
     fieldsets = (
         (None, {
             'classes': ('model-info',),
-            'fields': ['created',
+            'fields': ['id_hex',
+                       'key',
+                       'created',
                        'modified',
                        'get_config_list']
         }),
         (None, {
             'fields': ['name',
                        'group',
-                       'mac_address',
-                       'id_hex',
-                       'key',
-                       'backend',
-                       'model',
-                       'os',
-                       'system']
+                       'backend']
+        }),
+        (None, {
+            'fields': [('mac_address',
+                        'os'),
+                       ('model',
+                        'system')]
         })
     )
 

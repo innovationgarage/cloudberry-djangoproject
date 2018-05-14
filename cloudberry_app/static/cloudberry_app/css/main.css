@@ -79,3 +79,7 @@ ul.nav li {
 .json-editor-top-header .json-editor-btn-collapse {
     display: none;
 }
+
+#device_form #id_model,
+#device_form #id_os,
+#device_form #id_system{ width: auto !important; }
