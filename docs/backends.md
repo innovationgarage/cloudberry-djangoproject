@@ -15,21 +15,18 @@ Backend schemas are normal JSON schemas, with the addition of a way to reference
 
 # Backend transforms
 Transforms are written in the
-[SakForm](https://github.com/innovationgarage/sakstig) templating language (which uses SakStig/Objectpath path expressions).
+[SakForm](https://github.com/innovationgarage/sakstig) templating language
+(which uses [ObjectPath](http://objectpath.org/) expressions to extract values).
 
 ## Path context
 
-Template SakStig expressions have the following available to them:
+Template [ObjectPath](http://objectpath.org/) expressions have the following available to them:
 
 * @ the current path object, e.g. the object selected by the preceding fragment of the SakStig expression.
-
 * $.config the configuration to be transformed. This configuration matches the schema of the backend the
   transform belongs to.
-
 * @template() the current template object, e.g. the object selected by the path of the closest surrounding template.
-
 * $.context.fk foreign key model loader, see below.
-
 
 # Foreign keys
 Foreign keys to django models are represented in JSON as strings on the form 'fk://cloudberry_app.Device/4711'.
