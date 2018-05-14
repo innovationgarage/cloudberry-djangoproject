@@ -51,14 +51,13 @@ class Backend(django_admin_ownership.models.GroupedConfigurationMixin, BaseModel
     schema = JSONField(_('schema'),
                        default=dict,
                        blank=True,
-                       help_text=_('JSONSchema for the configuration'),
+                       help_text=_('<a target="_blank" href="http://json-schema.org/">JSONSchema</a> for the configuration'),
                        load_kwargs={'object_pairs_hook': collections.OrderedDict},
                        dump_kwargs={'indent': 4})
     transform = JSONField(_('transform'),
                        default=dict,
                        blank=True,
-                       help_text=_('<a href="https://github.com/dvdln/jsonpath-object-transform">jsonpath-object-transform</a>'
-                                   'to transform the schema to that of the back-end and/or template'),
+                       help_text=_('<a target="_blank" href="https://innovationgarage.github.io/cloudberry-djangoproject/docs/backends.html">Transform</a> of the configuration'),
                        load_kwargs={'object_pairs_hook': collections.OrderedDict},
                        dump_kwargs={'indent': 4})
     
