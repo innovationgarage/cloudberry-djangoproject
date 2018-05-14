@@ -181,7 +181,7 @@ var matchKey = (function () {
 
 
 var origJSONObjectEditor = JSONEditor.defaults.editors.object;
-JSONEditor.defaults.editors.object = JSONEditor.defaults.editors.object.extend({
+JSONEditor.defaults.editors.object = origJSONObjectEditor.extend({
   build: function () {
       origJSONObjectEditor.prototype.build.apply(this, arguments);
       $(this.editjson_holder).addClass('json-editor-edit-json-modal');
@@ -200,6 +200,69 @@ JSONEditor.defaults.editors.object = JSONEditor.defaults.editors.object.extend({
       }
   }  
 });
+
+var origJSONSelectEditor = JSONEditor.defaults.editors.select
+JSONEditor.defaults.editors.select = origJSONSelectEditor.extend({
+    build: function() {
+        origJSONSelectEditor.prototype.build.apply(this, arguments);
+        $(this.input).addClass('json-editor-select');
+        var id = 'json-editor-select-' + this.path.replace(".", "-");
+        $(this.input).attr("id", id);
+        $(this.input).attr("data-fk-model", this.schema.fk_model);
+        if (this.schema.change_url) {
+            var link = $('<a class="related-widget-wrapper-link change-related" id="change_' + id +
+                         '" data-href-template="' +
+                         this.schema.change_url +
+                         '" title="Change selected ' +
+                         this.getTitle() +
+                         '">');
+            link.append('<img src="/cloudberry/static/admin/img/icon-changelink.svg" alt="Change">');
+            $(this.control).find(".controls").append(link);
+        }
+        if (this.schema.add_url) {
+            var link = $('<a class="related-widget-wrapper-link change-related" id="change_' + id +
+                         '" data-href-template="' +
+                         this.schema.add_url +
+                         '" title="Add another ' +
+                         this.getTitle() +
+                         '">');
+            link.append('<img src="/cloudberry/static/admin/img/icon-addlink.svg" alt="Add">');
+            $(this.control).find(".controls").append(link);
+        }
+        if (this.schema.change_url || this.schema.add_url) {
+            updateRelatedObjectLinks(this.input);
+        }
+    }
+});
+
+/* Copied from /cloudberry/static/admin/js/admin/RelatedObjectLookups.js, but removes the fk://modelname/ before the __fk__ id */
+var updateRelatedObjectLinks = function(triggeringLink) {
+    var $this = $(triggeringLink);
+    var siblings = $this.nextAll('.change-related, .delete-related');
+    if (!siblings.length) {
+        return;
+    }
+    var value = $this.val();
+    if (value) {
+        value = value.split("/").pop();
+        siblings.each(function() {
+            var elm = $(this);
+            elm.attr('href', elm.attr('data-href-template').replace('__fk__', value));
+        });
+    } else {
+        siblings.removeAttr('href');
+    }
+}
+
+var origDismissAddRelatedObjectPopup = window.dismissAddRelatedObjectPopup;
+window.dismissAddRelatedObjectPopup = function dismissAddRelatedObjectPopup(win, newId, newRepr) {
+    var name = window.windowname_to_id(win.name);
+    var elem = document.getElementById(name);
+    if ($(elem).hasClass('json-editor-select')) {
+        newId = 'fk://' + $(elem).attr('data-fk-model') + '/' + newId;
+    }
+    origDismissAddRelatedObjectPopup(win, newId, newRepr);
+}
 
 // JSON-Schema Edtor django theme
 JSONEditor.defaults.themes.django = JSONEditor.defaults.themes.bootstrap2.extend({

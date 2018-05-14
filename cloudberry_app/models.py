@@ -81,7 +81,10 @@ class Backend(django_admin_ownership.models.GroupedConfigurationMixin, BaseModel
                     'title': cls,
                     'type': 'string',
                     'options': {'enum_titles': titles},
-                    'enum': values
+                    'enum': values,
+                    'fk_model': model,
+                    'add_url': '/admin/%s/%s/add/?_to_field=id&_popup=1' % (app_label, model_cls._meta.model_name),
+                    'change_url': '/admin/%s/%s/__fk__/change/?_to_field=id&amp;_popup=1' % (app_label, model_cls._meta.model_name)
                 }
             else:
                 schema['definitions']['fk__%s' % model.replace(".", "_")] = {
