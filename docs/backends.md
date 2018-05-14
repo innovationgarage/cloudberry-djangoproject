@@ -15,7 +15,7 @@ Backend schemas are normal JSON schemas, with the addition of a way to reference
 
 # Backend transforms
 Transforms are written in the
-[SakForm](https://github.com/innovationgarage/sakstig) templating language
+[SakForm](https://innovationgarage.github.io/sakstig/) templating language
 (which uses [ObjectPath](http://objectpath.org/) expressions to extract values).
 
 ## Path context
