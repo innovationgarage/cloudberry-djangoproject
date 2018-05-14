@@ -1,4 +1,5 @@
 from django.contrib import admin
+import django.forms
 from .models import *
 from .widget import JsonSchemaWidget
 import json
@@ -67,9 +68,6 @@ class ConfigAdmin(import_export.admin.ImportExportMixin,
     form = ConfigForm
     extra = 0
 
-#id_config_jsoneditor
-
-    
 class DeviceAdmin(import_export.admin.ImportExportMixin,
                   import_export.admin.ImportExportActionModelAdmin,
                   AbstractDeviceAdmin,
@@ -81,7 +79,7 @@ class DeviceAdmin(import_export.admin.ImportExportMixin,
     list_display =  AbstractDeviceAdmin.list_display + ['get_config_list']
     list_filter = ['created']
     list_select_related = ()
-    readonly_fields = ['id_hex', 'get_config_list']
+    readonly_fields = ('id_hex', 'get_config_list')
     fields = None
     fieldsets = (
         (None, {
@@ -103,6 +101,14 @@ class DeviceAdmin(import_export.admin.ImportExportMixin,
         })
     )
 
+    # Override base class that 'hides' id_hex in add view, breaking fieldsets...
+    def get_fields(self, request, obj=None):
+        return self.fields
+
+    def get_readonly_fields(self, request, obj=None):
+        return self.readonly_fields
+
+    
 class PreviewWidget(django.forms.widgets.Select):
     input_type = 'select'
     template_name = 'cloudberry_app/preview_widget.html'
