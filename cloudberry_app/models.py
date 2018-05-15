@@ -268,10 +268,3 @@ class Device(django_admin_ownership.models.GroupedConfigurationMixin, AbstractDe
             return config
         return json.dumps(config, **kwargs)
 
-
-django_x509.models.Ca.add_to_class(
-    'group', models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
-                               on_delete=models.CASCADE))
-
-django_x509.models.Ca._configuration_group = ["group"]
-django_x509.models.Cert._configuration_group = ["ca", "group"]

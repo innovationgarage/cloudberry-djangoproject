@@ -55,6 +55,7 @@ INSTALLED_APPS = [
     # django_netjsonconfig itself
     'cloudberry_app',
     'django_freeradius',
+    'cloudberry_ownership',
 ]
 
 MIDDLEWARE = [

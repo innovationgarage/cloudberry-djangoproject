@@ -9,7 +9,6 @@ from django_admin_ownership.cross_app_migrations import WithAppLabelOperation
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cloudberry_app', '0001_initial'),
         ('django_admin_ownership', '__first__'),
         ('django_x509', '0005_organizational_unit_name'),
     ]
