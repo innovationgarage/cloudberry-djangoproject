@@ -35,7 +35,7 @@ They should however be considered opaque values save for the fk:// prefix.
 ## Schema specification
 Foreign keys can be specified in the JSON schema as a reference to a schema definition with a special name:
 
-    {"$ref": "#/definitions/fk__cloudberry_app_Device"}
+    {"$ref": "#/definitions/fk__cloudberry_app__Device"}
 
 The definition itself is a string enum of all possible foreign keys, and will produce a drop-down list in the configuration
 editor, with the usual add/edit django admin buttons next to it.
