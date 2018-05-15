@@ -59,11 +59,13 @@ Transforms are written in the
 
 Template [ObjectPath](http://objectpath.org/) expressions have the following available to them:
 
-* @ the current path object, e.g. the object selected by the preceding fragment of the SakStig expression.
-* $.config the configuration to be transformed. This configuration matches the schema of the backend the
-  transform belongs to.
-* @template() the current template object, e.g. the object selected by the path of the closest surrounding template.
-* $.context.fk foreign key model loader, see below.
+  * `@` the current path object, e.g. the object selected by the preceding fragment of the SakStig expression.
+  * `$.config` the configuration to be transformed. This configuration matches the schema of the backend the
+    transform belongs to.
+  * `@template()` the current template object, e.g. the object selected by the path of the closest surrounding template.
+  * `$.context.device` is the current device being configured
+    * `$.context.device.pk` can be used to test equality with a foreign key to `cloudberry_app.Device`
+  * `$.context.fk` foreign key model loader, see below.
 
 # Foreign keys
 Foreign keys to django models are represented in JSON as strings on the form 'fk://cloudberry_app.Device/4711'.
