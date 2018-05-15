@@ -17,6 +17,7 @@ Example JSON schema for configuring a set of devices with an ip number and port:
 
     {
         "properties": {
+            "version": {"type": "string"},
             "servers": {
                 "type": "array",
                 "items": {
@@ -34,6 +35,7 @@ Example JSON schema for configuring a set of devices with an ip number and port:
 Example configuration that a user can generate using the configuration editor and a backend with the above schema:
 
     {
+        "version": "alpha-1",
         "servers": [
             {
                 "host": "fk://cloudberry_app.Device/e19d0072-daae-4e0b-8514-47d73f522bc1",
@@ -80,3 +82,26 @@ SakForm templates can load a django models by their JSON foreign key representat
 context variable:
 
     $.context.fk['fk://cloudberry_app.Device/4711'].some_device_attribute_name
+
+# Example transform
+
+The following transform takes the example configuration shown above and transforms it into configuration for a hypothetical (single) device:
+
+    {
+        "fooware_server": {
+            "version": {"$": "'fooware-' + $.config.version"},
+            "url": {"$": "'http://' + @template().ip + ':' + @template().port"}
+        },
+        "$": "$.config.servers.*[@.host is $.context.device.pk]"
+    }
+
+For the device `4e4a5c64-a84a-4abe-91c8-74d8496a8c1d` the above configuration and transform would render
+
+    {
+        "fooware_server": {
+            "version": "fooware-alpha-1",
+            "url": "http://10.0.0.1:4712
+        }
+    }
+    
+which would be sent to to the lower backend.
