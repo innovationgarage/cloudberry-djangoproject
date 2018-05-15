@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     # extendnetjson: Include your extension app here, not
     # django_netjsonconfig itself
     'cloudberry_app',
+    'django_freeradius',
 ]
 
 MIDDLEWARE = [

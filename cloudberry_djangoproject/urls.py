@@ -25,6 +25,7 @@ urlpatterns = [
     url(r'^', include('cloudberry_app.controller.urls', namespace='controller')),
     url(r'^', include('cloudberry_app.urls', namespace='netjsonconfig')),
     url(r'^', include('django_x509.urls', namespace='x509')),
+    url(r'^', include('django_freeradius.urls', namespace='freeradius')),
 ]
 
 # extendnetjson: django_netjsonconfig requires staticfiles to
