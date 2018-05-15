@@ -64,10 +64,13 @@ class Backend(django_admin_ownership.models.GroupedConfigurationMixin, BaseModel
     def _add_foreign_key(self, schema, model, title):
         app_label, cls = model.rsplit(".", 1)
         model_cls = django.apps.apps.get_registered_model(app_label, cls)
-        instances = model_cls.objects_allowed_to(
-            model_cls.objects.all(),
-            read=django_global_request.middleware.get_request().user
-        ).order_by(title)
+        instances = model_cls.objects.all()
+        if hasattr(model_cls, "objects_allowed_to"):
+            instances = model_cls.objects_allowed_to(
+                instances,
+                read=django_global_request.middleware.get_request().user
+            )
+        instances = instances.order_by(title)
         titles = [getattr(instance, title) for instance in instances]
         values = ["fk://%s/%s" % (model, instance.id)
                   for instance in instances]
