@@ -19,5 +19,11 @@ pipeline {
       }
       // TODO: run the server
     }
-    // TODO: add post block for Slack.
+
+    post {
+      always {
+        deleteDir()
+      }
+      // TODO: add post block for Slack.
+    }
 }
