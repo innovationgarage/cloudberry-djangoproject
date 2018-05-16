@@ -3,6 +3,7 @@ from django_netjsonconfig.views import *
 import django_netjsonconfig.views
 import json
 import cloudberry_app.models
+import cloudberry_app.schema
 import os.path
 import traceback
 
@@ -26,7 +27,8 @@ def schema_backend(request, schema):
     c = {"error": "Not found"}
     status = 404
     if schema in available_schemas:
-        c = available_schemas[schema]
+        c = cloudberry_app.schema.extend_schema(
+            available_schemas[schema])
         status = 200
     return HttpResponse(json.dumps(c), status=status, content_type='application/json')
 

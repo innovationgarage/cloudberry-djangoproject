@@ -33,6 +33,7 @@ import cloudberry_app.schema
 import django_global_request.middleware
 import tablib
 import django.urls
+from copy import deepcopy
 
 class Backend(django_admin_ownership.models.GroupedConfigurationMixin, BaseModel, cloudberry_app.backends.BackendedModelMixin, cloudberry_app.backends.TemplatedBackendModelMixin):
     group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
@@ -72,19 +73,6 @@ class Backend(django_admin_ownership.models.GroupedConfigurationMixin, BaseModel
         except JsonSchemaError as e:
             raise ValidationError(e)
 
-    def extract_foreign_keys(self, config, model):
-        if isinstance(config, str):
-            if config.startswith("fk://%s" % model):
-                yield config.split("/")[-1]
-        elif isinstance(config, (dict, collections.OrderedDict)):
-            for key, value in config.items():
-                for fk in self.extract_foreign_keys(value, model):
-                    yield fk
-        elif isinstance(config, (list, tuple)):
-            for value in config:
-                for fk in self.extract_foreign_keys(value, model):
-                    yield fk
-                    
 class Config(django_admin_ownership.models.GroupedConfigurationMixin, cloudberry_app.backends.BackendedModelMixin, BaseConfig):
     group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
                                on_delete=models.CASCADE)
@@ -115,19 +103,26 @@ class Config(django_admin_ownership.models.GroupedConfigurationMixin, cloudberry
         while hasattr(obj, 'get_backend_instance'):
             obj = obj.get_backend_instance()
         return obj
+
+    def get_config(self):
+        config = super().get_config()
+        for key in list(config.keys()):
+            if key.startswith("__") and key.endswith("__"):
+                del config[key]
+        return config
     
     def save(self, *arg, **kw):
         super().save(*arg, **kw)
 
         backend = self.get_backend_instance()
-        if hasattr(backend, "extract_foreign_keys"):
-            self.refers_devices.clear()
-            self.refers_configs.clear()
-            for device in backend.extract_foreign_keys(self.config, 'cloudberry_app.Device'):
-                self.refers_devices.add(device)
 
-            for config in backend.extract_foreign_keys(self.config, 'cloudberry_app.Config'):
-                self.refers_configs.add(config)
+        self.refers_devices.clear()
+        self.refers_configs.clear()
+        for model, fk in cloudberry_app.schema.extract_foreign_keys(self.config):
+            if model == 'cloudberry_app.Device':
+                self.refers_devices.add(fk)
+            elif model == 'cloudberry_app.Config':
+                self.refers_configs.add(fk)
 
     def get_device_list(self):
         return ", ".join([c.name for c in self.refers_devices.all()])

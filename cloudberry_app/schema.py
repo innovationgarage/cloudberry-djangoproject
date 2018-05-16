@@ -1,5 +1,6 @@
 import django.apps
 import django_global_request.middleware
+import collections
 
 def add_foreign_key(schema, model, title):
     app_label, cls = model.rsplit(".", 1)
@@ -51,17 +52,34 @@ def schema_add_foreign_keys(schema):
 
 def schema_add_device(schema):
     if 'cloudberry_app.Device' not in (model for (model, data) in find_foreign_keys(schema)):
-        schema['properties']['device'] = {
+        schema['properties']['__device__'] = {
             "type": "object",
+            "title": "Device",
             "properties": {
                 "device": {"$ref": "#/definitions/fk__cloudberry_app__Device", "title": "name"}
-            }
+            },
+            "required": ["device"]
         }
         if 'required' not in schema:
             schema['required'] = []
-        schema['required'].append('Device')
+        schema['required'].append('__device__')
+        if 'defaultProperties' in schema:
+            schema['defaultProperties'].append('__device__')
     return schema
 
 def extend_schema(schema):
     return schema_add_foreign_keys(
         schema_add_device(schema))
+
+def extract_foreign_keys(config):
+    if isinstance(config, str):
+        if config.startswith("fk://"):
+            yield config.split("://")[1].split("/")
+    elif isinstance(config, (dict, collections.OrderedDict)):
+        for key, value in config.items():
+            for fk in extract_foreign_keys(value):
+                yield fk
+    elif isinstance(config, (list, tuple)):
+        for value in config:
+            for fk in extract_foreign_keys(value):
+                yield fk
