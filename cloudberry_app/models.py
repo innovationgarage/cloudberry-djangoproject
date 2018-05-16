@@ -29,6 +29,7 @@ import django_x509.models
 import django_admin_ownership.models
 import cloudberry_app.fields
 import cloudberry_app.transform
+import cloudberry_app.schema
 import django_global_request.middleware
 import tablib
 import django.urls
@@ -61,57 +62,9 @@ class Backend(django_admin_ownership.models.GroupedConfigurationMixin, BaseModel
                        load_kwargs={'object_pairs_hook': collections.OrderedDict},
                        dump_kwargs={'indent': 4})
     
-    def _add_foreign_key(self, schema, model, title):
-        app_label, cls = model.rsplit(".", 1)
-        model_cls = django.apps.apps.get_registered_model(app_label, cls)
-        instances = model_cls.objects.all()
-        if hasattr(model_cls, "objects_allowed_to"):
-            instances = model_cls.objects_allowed_to(
-                instances,
-                read=django_global_request.middleware.get_request().user
-            )
-        instances = instances.order_by(title)
-        titles = [getattr(instance, title) for instance in instances]
-        values = ["fk://%s/%s" % (model, instance.id)
-                  for instance in instances]
-        if values:
-            schema['definitions']['fk__%s' % model.replace(".", "__")] = {
-                'title': cls,
-                'type': 'string',
-                'options': {'enum_titles': titles},
-                'enum': values,
-                'fk_model': model,
-                'add_url': '/admin/%s/%s/add/?_to_field=id&_popup=1' % (app_label, model_cls._meta.model_name),
-                'change_url': '/admin/%s/%s/__fk__/change/?_to_field=id&amp;_popup=1' % (app_label, model_cls._meta.model_name)
-            }
-        else:
-            schema['definitions']['fk__%s' % model.replace(".", "__")] = {
-                'title': cls,
-                'type': 'object'
-            }
-            
-    def _find_foreign_key(self, schema):
-        # Finds {"$ref": "#/definitions/fk__cloudberry_app__Device"} schema items and yields
-        # ("cloudberry_app.Device", {"$ref": "#/definitions/fk__cloudberry_app__Device"})
-        if not hasattr(schema, 'items'): return
-        if "$ref" in schema and schema["$ref"].startswith("#/definitions/fk__"):
-            yield (schema["$ref"].split("#/definitions/fk__")[1].replace("__", "."), schema)
-        for name, value in schema.items():
-            if name == "$ref": continue
-            for fk in self._find_foreign_key(value):
-                yield fk
-                
-    def _schema_add_foreign_keys(self, schema):
-        schema = dict(schema)
-        if 'definitions' not in schema:
-            schema['definitions'] = {}
-        for model, data in list(self._find_foreign_key(schema)):
-            self._add_foreign_key(schema, model, data.get("title", "name"))
-        return schema
-
     @property
     def extended_schema(self):
-        return self._schema_add_foreign_keys(self.schema)
+        return cloudberry_app.schema.extend_schema(self.schema)
     
     def validate(self):
         try:
