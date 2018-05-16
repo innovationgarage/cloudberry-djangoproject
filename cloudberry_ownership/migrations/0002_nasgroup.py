@@ -10,7 +10,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('cloudberry_ownership', '0001_cagroup'),
-        ('django_x509', '0005_organizational_unit_name'),
+        ('django_freeradius', '0014_auto_20171226_1938')
     ]
 
     operations = [
