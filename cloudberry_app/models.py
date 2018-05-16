@@ -39,7 +39,7 @@ class Backend(django_admin_ownership.models.GroupedConfigurationMixin, BaseModel
                                on_delete=models.CASCADE)
     _configuration_group = ["group"]
 
-    schema_prefix = "/cloudberry_app/schema/transform"
+    schema_prefix = "/cloudberry_app/schema"
 
     backend = cloudberry_app.fields.DynamicTextListField(
         _('backend'),

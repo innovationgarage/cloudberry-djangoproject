@@ -46,24 +46,3 @@ def schema_dynamic(request, schema):
 @check_auth
 def schema_meta(request):
     return HttpResponse(json.dumps(meta_schema), status=200, content_type='application/json')
-
-
-@check_auth
-def schema_transform_backend(request, schema):
-    c = {"error": "Not found"}
-    status = 404
-    if schema in available_schemas:
-        c = available_schemas[schema]
-        status = 200
-    return HttpResponse(json.dumps(c), status=status, content_type='application/json')
-
-
-@check_auth
-def schema_transform_dynamic(request, schema):
-    try:
-        c = cloudberry_app.models.Backend.objects.get(id=schema).extended_schema
-        status = 200
-    except:
-        c = {"error": "Not found"}
-        status = 404
-    return HttpResponse(json.dumps(c), status=status, content_type='application/json')
