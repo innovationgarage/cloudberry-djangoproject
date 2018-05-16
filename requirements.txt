@@ -3,3 +3,4 @@ django_netjsonconfig
 sakstig
 django-middleware-global-request
 django-import-export
+cloudberry-django-freeradius
