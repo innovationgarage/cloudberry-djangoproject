@@ -1,16 +1,16 @@
 [
   {
-    "read": "1",
-    "write": "1",
-    "id": 2,
-    "name": "Default configuration group",
-    "group": 1
-  },
-  {
     "read": "",
     "write": "",
     "id": 1,
     "name": "Meta configuration group",
     "group": null
+  },
+  {
+    "read": "1",
+    "write": "1",
+    "id": 2,
+    "name": "Default configuration group",
+    "group": 1
   }
 ]
