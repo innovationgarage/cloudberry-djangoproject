@@ -156,3 +156,9 @@ if 'runserver' in sys.argv:
     ROOT = ''
 else:
     ROOT = '/cloudberry'
+
+local_settings = os.path.join(os.path.dirname(os.path.dirname(__file__)), "local_settings.py")
+if os.path.exists(local_settings):
+    with open(local_settings) as f:
+        code = compile(f.read(), local_settings, 'exec')
+        exec(code, globals(), locals())
