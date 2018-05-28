@@ -1,6 +1,6 @@
 ifndef VIRTUAL_ENV
 env/bin/activate:
-	virtualenv env -p python3
+	virtualenv env --system-site-packages --python=python3
 $(MAKECMDGOALS): env/bin/activate
 	. env/bin/activate; $(MAKE) $(MAKECMDGOALS)
 else
@@ -18,6 +18,13 @@ migrate:
 
 createsuperuser:
 	python3 manage.py createsuperuser
+
+createsuperuser-silent-if-needed:
+	python3 manage.py shell -c "import django.contrib.auth.models; u=django.contrib.auth.models.User.objects.get(username='admin')" > /dev/null 2>&1 || $(MAKE) createsuperuser-silent
+
+createsuperuser-silent:
+	python3 manage.py createsuperuser --noinput --username admin --email a@a.com
+	python3 manage.py shell -c "import django.contrib.auth.models; u=django.contrib.auth.models.User.objects.get(username='admin'); u.set_password('password'); u.save();"
 
 defaultdata:
 	python manage.py import_file --resource-class django_admin_ownership.importexport.GroupResource examples/Groups.json
