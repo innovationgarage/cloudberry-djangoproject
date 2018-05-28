@@ -27,9 +27,9 @@ createsuperuser-silent:
 	python3 manage.py shell -c "import django.contrib.auth.models; u=django.contrib.auth.models.User.objects.get(username='admin'); u.set_password('password'); u.save();"
 
 defaultdata:
-	python manage.py import_file --resource-class django_admin_ownership.importexport.GroupResource examples/Groups.json
-	python manage.py import_file --resource-class django_admin_ownership.importexport.ConfigurationGroupResource examples/ConfigurationGroups.json
-	python manage.py import_file --resource-class cloudberry_app.importexport.BackendResource examples/Backends.json
+	python3 manage.py import_file --resource-class django_admin_ownership.importexport.GroupResource examples/Groups.json
+	python3 manage.py import_file --resource-class django_admin_ownership.importexport.ConfigurationGroupResource examples/ConfigurationGroups.json
+	python3 manage.py import_file --resource-class cloudberry_app.importexport.BackendResource examples/Backends.json
 
 jenkins:
 	./setup-jenkins.sh
