@@ -4,6 +4,7 @@ import import_export.resources
 import import_export.fields
 import import_export.widgets
 import import_export.formats.base_formats
+import tablib
 
 class JSON_FORMAT(import_export.formats.base_formats.JSON):
     def export_data(self, dataset, **kwargs):
