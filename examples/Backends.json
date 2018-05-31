@@ -4,7 +4,7 @@
     "created": "2018-03-22 12:46:22",
     "modified": "2018-05-03 12:08:45",
     "name": "CloudberryVPN",
-    "backend": "/cloudberry_app/schema/transform/backend/cloudberry_netjson.OpenWrt",
+    "backend": "/cloudberry_app/schema/backend/cloudberry_netjson.OpenWrt",
     "schema": {
       "definitions": {
         "server": {
@@ -438,7 +438,7 @@
     "created": "2018-05-02 16:38:32",
     "modified": "2018-05-03 12:11:13",
     "name": "CloudberryVPNDockerManager",
-    "backend": "/cloudberry_app/schema/transform/backend/cloudberry_netjson.OpenWrt",
+    "backend": "/cloudberry_app/schema/backend/cloudberry_netjson.OpenWrt",
     "schema": {
       "properties": {
         "device": {
