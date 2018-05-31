@@ -79,11 +79,11 @@ class BackendedModelMixin(BackendedMixin):
         return []
 
     def backend_class(self, **kwargs):
-        if self.backend.startswith("/dynamic/" % self.schema_prefix):
+        if self.backend.startswith("%s/dynamic/" % self.schema_prefix):
             import cloudberry_app.models
             backend = cloudberry_app.models.Backend.objects.get(id=self.backend.split("/")[-1])
             backend.init_backend(**kwargs)
-        elif self.backend.startswith("/backend/" % self.schema_prefix):
+        elif self.backend.startswith("%s/backend/" % self.schema_prefix):
             backend_cls = import_string(self.backend.split("/")[-1])
             backend = backend_cls(**kwargs)
         else:
