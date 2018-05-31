@@ -150,11 +150,13 @@
                     schema_selector = '#id_backend, #id_config-0-backend';
                 }
                 var backend = $(schema_selector);
+                var schema_selector_base = field.attr("data-schema-selector-base") || "";
+                
                 // load first time
-                loadUiAndSchema(el, backend.val(), true);
+                loadUiAndSchema(el, schema_selector_base + backend.val(), true);
                 // reload when backend is changed
                 backend.change(function(){
-                    loadUiAndSchema(el, backend.val());
+                    loadUiAndSchema(el, schema_selector_base + backend.val());
                 });
             }
         });

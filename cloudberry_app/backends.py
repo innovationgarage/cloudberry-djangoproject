@@ -60,7 +60,6 @@ class BackendedModelMixin(BackendedMixin):
     def get_backends(cls, schema_prefix=None):
         if schema_prefix is None:
             schema_prefix = cls.schema_prefix
-        schema_prefix = settings.ROOT + schema_prefix
         for item in app_settings.BACKENDS:
             yield ("%s/backend/%s" % (schema_prefix, item[0]), item[1])
         import cloudberry_app.models
@@ -71,7 +70,7 @@ class BackendedModelMixin(BackendedMixin):
             return
 
     def get_url(self, schema_prefix = None):
-        return "%s/dynamic/%s" % (settings.ROOT + (schema_prefix or self.schema_prefix), self.id)
+        return "%s/dynamic/%s" % (schema_prefix or self.schema_prefix, self.id)
 
     def get_context(self):
         return getattr(self, 'context', {})
@@ -80,7 +79,6 @@ class BackendedModelMixin(BackendedMixin):
         return []
 
     def backend_class(self, **kwargs):
-        schema_prefix = settings.ROOT + self.schema_prefix
         if self.backend.startswith("%s/dynamic/" % schema_prefix):
             import cloudberry_app.models
             backend = cloudberry_app.models.Backend.objects.get(id=self.backend.split("/")[-1])

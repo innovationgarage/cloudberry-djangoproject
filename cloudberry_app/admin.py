@@ -16,6 +16,7 @@ import cloudberry_app.importexport
 import import_export.admin
 import cloudberry_import_export
 import reversion
+from django.conf import settings
 
 from django_netjsonconfig.base.admin import (AbstractConfigForm,
                                              AbstractConfigInline,
@@ -27,13 +28,15 @@ from django_netjsonconfig.base.admin import (AbstractConfigForm,
 class ConfigForm(AbstractConfigForm):
     class Meta(AbstractConfigForm.Meta):
         model = Config
-        widgets = {'config': JsonSchemaWidget(attrs={'data-options': json.dumps({
-            "theme": 'django',
-            "iconlib": "fontawesome4",
-            "disable_collapse": False,
-            "disable_edit_json": False,
-            "display_required_only": True
-        })})}
+        widgets = {'config': JsonSchemaWidget(attrs={
+            'data-schema-selector-base': settings.ROOT,
+            'data-options': json.dumps({
+                "theme": 'django',
+                "iconlib": "fontawesome4",
+                "disable_collapse": False,
+                "disable_edit_json": False,
+                "display_required_only": True
+            })})}
 
 class ConfigAdmin(import_export.admin.ImportExportMixin,
                   import_export.admin.ImportExportActionModelAdmin,
