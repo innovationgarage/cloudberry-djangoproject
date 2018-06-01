@@ -468,5 +468,74 @@
         }
       ]
     }
+  },
+  {
+    "id": "3947ac0c-6572-11e8-a98c-97f6f2454c2c",
+    "created": "2018-06-01 10:03:00",
+    "modified": "2018-06-01 10:03:00",
+    "name": "Chilli",
+    "backend": "/cloudberry_app/schema/backend/cloudberry_netjson.OpenWrt",
+    "schema": {
+      "required": ["chilli"],
+      "definitions": {
+        "ip": {"type": "string", "format": "ipv4"},
+        "network": {"type": "string"},
+        "iface": {"type": "string"},
+        "url": {"type": "string", "format": "uri"}
+      },
+      "properties": {
+        "chilli": {
+          "type": "object",
+          "required": ["radiusnasid","radiussecret","uamsecret","locationname","radiuslocationname","radiuslocationid","radiusserver1","radiusserver2","dhcpif","dns1","dns2","tundev","net","uamlisten","lease","leaseplus","uamserver","uamuiport","uamanydns","uamaliasname","nouamsuccess","uamallowed","swapoctets","interval","network","domain"],
+          "properties": {
+            "radiusnasid": {"type": "string"},
+            "radiussecret": {"type": "string"},
+            "uamsecret": {"type": "string"},
+            
+            "locationname": {"type": "string"},
+            "radiuslocationname": {"type": "string"},
+            "radiuslocationid": {"type": "string"},
+
+            "radiusserver1": {"$ref": "#/definitions/ip"},
+            "radiusserver2": {"$ref": "#/definitions/ip"},
+
+            "dhcpif": {"$ref": "#/definitions/iface"},
+
+            "dns1": {"$ref": "#/definitions/ip"},
+            "dns2": {"$ref": "#/definitions/ip"},
+
+            "tundev": {"$ref": "#/definitions/iface"},
+            "net": {"$ref": "#/definitions/network"},
+            "uamlisten": {"$ref": "#/definitions/ip"},
+            "lease": {"type": "integer"},
+            "leaseplus": {"type": "integer"},
+
+            "uamserver": {"$ref": "#/definitions/url"},
+            "uamuiport": {"type": "integer"},
+            "uamanydns": {"type": "integer"},
+            "uamaliasname": {"type": "string"},
+            "nouamsuccess": {"type": "integer"},
+
+            "uamallowed": {"type": "string"},
+
+            "swapoctets": {"type": "integer"},
+            "interval": {"type": "integer"},
+
+            "network": {"type": "string"},
+            "domain": {"type": "string"}
+          }
+        }
+      }
+    },
+    "transform": {
+      "chilli": [
+        {
+          "config_name": "chilli",
+          "ipup": "/etc/chilli/up.sh",
+          "ipdown": "/etc/chilli/down.sh",
+          "_": {"$": "@template() + $.config.chilli"}
+        }
+      ]
+    }
   }
 ]
