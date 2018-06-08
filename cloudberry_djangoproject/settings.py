@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'cloudberry_app',
     'django_freeradius',
     'cloudberry_ownership',
+    'cloudberry_auth',
 ]
 
 MIDDLEWARE = [
@@ -151,6 +152,16 @@ NETJSONCONFIG_BACKENDS = (
     ('netjsonconfig.OpenWisp', 'OpenWISP Firmware 1.x'))
 
 MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
+
+PASSWORD_HASHERS = [
+    'cloudberry_auth.password.FreeradiusSHA1PasswordHasher',
+    'django.contrib.auth.hashers.SHA1PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
+    'django.contrib.auth.hashers.Argon2PasswordHasher',
+    'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
+    'django.contrib.auth.hashers.BCryptPasswordHasher'
+]
 
 if 'runserver' in sys.argv:
     ROOT = ''
