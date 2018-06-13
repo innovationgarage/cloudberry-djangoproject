@@ -1,3 +1,4 @@
+django==2.0.6
 cloudberry_netjson
 django_netjsonconfig
 sakstig
