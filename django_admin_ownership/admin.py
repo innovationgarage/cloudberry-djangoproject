@@ -36,5 +36,8 @@ class UserAdmin(import_export.admin.ImportExportMixin,
     resource_class = django_admin_ownership.importexport.UserResource
     formats=(cloudberry_import_export.JSON_FORMAT,)
 
-django.contrib.admin.site.unregister(django.contrib.auth.models.User)
-django.contrib.admin.site.register(django.contrib.auth.models.User, UserAdmin)
+# django.contrib.admin.site.unregister(django.contrib.auth.models.User)
+# django.contrib.admin.site.register(django.contrib.auth.models.User, UserAdmin)
+
+# django.contrib.admin.site.unregister(settings.AUTH_USER_MODEL)
+# django.contrib.admin.site.register(settings.AUTH_USER_MODEL, UserAdmin)

@@ -15,7 +15,6 @@ import os, sys, imp
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/2.0/howto/deployment/checklist/
 
@@ -55,9 +54,15 @@ INSTALLED_APPS = [
     # django_netjsonconfig itself
     'cloudberry_app',
     'django_freeradius',
-    'cloudberry_ownership',
+#    'cloudberry_ownership', #FIXME
     'cloudberry_auth',
+    'users',
+    'pages',
 ]
+
+AUTH_USER_MODEL = 'users.CustomUser'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -75,7 +80,7 @@ ROOT_URLCONF = 'cloudberry_djangoproject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
