@@ -176,6 +176,7 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptPasswordHasher'
 ]
 
+# signup with Gmail
 AUTHENTICATION_BACKENDS = (
         "django.contrib.auth.backends.ModelBackend",
         "allauth.account.auth_backends.AuthenticationBackend",
@@ -185,6 +186,14 @@ SITE_ID = 1
 
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
+
+# email verification
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'igcloudberry@gmail.com'
+EMAIL_HOST_PASSWORD = 'saltgurka'
+EMAIL_PORT = 587
+
 
 if 'runserver' in sys.argv:
     ROOT = ''
