@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites', 
     # extendnetjson: Dependencies for django_netjsonconfig
     'sortedm2m',
     'reversion',
@@ -56,8 +57,15 @@ INSTALLED_APPS = [
     'django_freeradius',
 #    'cloudberry_ownership', #FIXME
     'cloudberry_auth',
+    # account registration
     'users',
     'pages',
+    # 3rd party authentications (Google / PayPal)
+    'allauth',
+    'allauth.account',
+    'allauth.socialaccount',
+    'allauth.socialaccount.providers.google',
+#    'allauth.socialaccount.providers.paypal', #FIXME
 ]
 
 AUTH_USER_MODEL = 'users.CustomUser'
@@ -167,6 +175,16 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
     'django.contrib.auth.hashers.BCryptPasswordHasher'
 ]
+
+AUTHENTICATION_BACKENDS = (
+        "django.contrib.auth.backends.ModelBackend",
+        "allauth.account.auth_backends.AuthenticationBackend",
+    )
+
+SITE_ID = 1
+
+ACCOUNT_EMAIL_REQUIRED = True
+ACCOUNT_USERNAME_REQUIRED = False
 
 if 'runserver' in sys.argv:
     ROOT = ''

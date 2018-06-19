@@ -20,9 +20,12 @@ from django.views.generic.base import TemplateView
 
 urlpatterns = [
     path('', include('pages.urls')),
-    path('users/', include('users.urls')),
-    path('users/', include('django.contrib.auth.urls')),
+    # Django admin
     path('admin/', admin.site.urls),
+    path('users/', include('django.contrib.auth.urls')),
+    # User management
+    path('users/', include('users.urls')),
+    path('accounts/', include('allauth.urls')),
     # extendnetjson: Urls to your extension app and its controller The
     # controller is the set of views used by devices to download
     # configuration    
