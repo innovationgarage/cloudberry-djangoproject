@@ -34,6 +34,7 @@ import django_global_request.middleware
 import tablib
 import django.urls
 from copy import deepcopy
+import urllib.request
 
 class Backend(django_admin_ownership.models.GroupedConfigurationMixin, BaseModel, cloudberry_app.backends.BackendedModelMixin, cloudberry_app.backends.TemplatedBackendModelMixin):
     group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
@@ -171,6 +172,21 @@ class Device(django_admin_ownership.models.GroupedConfigurationMixin, AbstractDe
                                help_text=_('Select <a href="http://netjsonconfig.openwisp.org/en/'
                                            'stable/" target="_blank">netjsonconfig</a> backend'))
 
+    os_image = cloudberry_app.fields.DynamicTextListField(
+        _('os image'),
+        blank=True,
+        max_length=128,
+        help_text=_('Select OS image'))
+    def _get_os_images():
+        try:
+            with urllib.request.urlopen(settings.OPENWISP_DEVICE_IMAGE_URL) as f:
+                return [(row, row) for row in f]
+        except Exception as e:
+            print(e)
+            return []
+        
+    os_image.choices_fn = _get_os_images
+    
     class Meta(AbstractDevice.Meta):
         abstract = False
 

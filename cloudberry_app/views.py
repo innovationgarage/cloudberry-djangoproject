@@ -6,6 +6,8 @@ import cloudberry_app.models
 import cloudberry_app.schema
 import os.path
 import traceback
+from django.conf import settings
+import urllib.parse
 
 with open(os.path.join(os.path.dirname(__file__), "json-schema-meta-schema.json")) as f:
     meta_schema = json.load(f)
@@ -48,3 +50,26 @@ def schema_dynamic(request, schema):
 @check_auth
 def schema_meta(request):
     return HttpResponse(json.dumps(meta_schema), status=200, content_type='application/json')
+
+@check_auth
+def download_device_image(request, device):
+    device = cloudberry_app.models.Device.objects.get(pk=device)
+
+    image_path = os.path.join(settings.OPENWISP_DEVICE_IMAGES, "%s.img" % device.pk)
+    if not os.path.exists(image_path):
+        if not os.path.exists(os.path.dirname(image_path)):
+            os.makedirs(os.path.dirname(image_path))
+        with open(image_path, "w") as f:
+            with urllib.request.urlopen("%s/%s?OPENWISP_UUID=%s&OPENWISP_KEY=%s&OPENWISP_URL=%s" % (
+                    settings.OPENWISP_DEVICE_IMAGE_URL,
+                    device.os_image,
+                    device.pk,
+                    device.key,
+                    urllib.parse.quote(request.build_absolute_uri(settings.ROOT)))) as f:
+                assert f.getcode() == 200
+
+    with open(image_path) as f:
+        resp = HttpResponse(f.read(), status=200, content_type='application/binary')
+        resp['Content-Disposition'] = 'attachment; filename="%s.img"' % device.pk
+
+        return resp

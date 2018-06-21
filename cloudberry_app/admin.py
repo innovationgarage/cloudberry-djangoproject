@@ -76,6 +76,13 @@ class DeviceAdmin(import_export.admin.ImportExportMixin,
                   AbstractDeviceAdmin,
                   reversion.admin.VersionAdmin):
     change_form_template = 'cloudberry_app/device_admin.html'
+
+    def get_extra_context(self, pk=None):
+        ctx = AbstractDeviceAdmin.get_extra_context(self, pk)
+        if pk:
+            ctx['download_image_url'] = django.urls.reverse('cloudberry_app:download_device_image', kwargs={"device": pk})
+        return ctx
+    
     formats=(cloudberry_import_export.JSON_FORMAT,)
     resource_class = cloudberry_app.importexport.DeviceResource
     inlines = []
@@ -99,7 +106,8 @@ class DeviceAdmin(import_export.admin.ImportExportMixin,
                        'backend']
         }),
         (None, {
-            'fields': [('mac_address',
+            'fields': ['os_image',
+                       ('mac_address',
                         'os'),
                        ('model',
                         'system')]
