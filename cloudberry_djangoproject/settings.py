@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.contenttypes',    
     'registration', #should be immediately above 'django.contrib.admin'
+    'cloudberry_accounts',
     'django.contrib.admin',
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -80,7 +81,7 @@ ROOT_URLCONF = 'cloudberry_djangoproject.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
