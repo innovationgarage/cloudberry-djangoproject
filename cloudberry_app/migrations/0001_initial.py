@@ -19,7 +19,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('auth', '0010_configurationgroup'),
+        ('django_admin_ownership', '0001_initial'),
     ]
 
     operations = [
