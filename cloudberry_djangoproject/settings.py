@@ -30,6 +30,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'cloudberry_accounts',
     'import_export',
     'django_import_export_cli',
     'django_global_request',
@@ -41,7 +42,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.contenttypes',    
     'registration', #should be immediately above 'django.contrib.admin'
-    'cloudberry_accounts',
     'django.contrib.admin',
     'django.contrib.messages',
     'django.contrib.staticfiles',

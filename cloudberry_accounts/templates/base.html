@@ -1,0 +1,26 @@
+{% extends "admin/base_site.html" %}
+{% load i18n %}
+
+{% block content_title %}
+  <h1>{% block title %}{% endblock %}</h1>
+  {% block object-tools %}
+    <ul class="object-tools">
+      {% block object-tools-items %}
+        {% if user.is_authenticated %}
+            <li>{% trans "Logged in" %}: {{ user.get_username }}</li>
+            <li><a href="{% url 'auth_logout' %}">{% trans "Log out" %}</a></li>
+            <li><a href="{% url 'auth_password_change' %}">{% trans "Change password" %}</a></li>
+        {% else %}
+           <li><a href="{% url 'auth_login' %}">{% trans "Log In" %}</a></li>
+        {% endif %}
+      {% endblock %}
+    </ul>
+  {% endblock %}
+{% endblock %}
+    
+{% block breadcrumbs %}
+  <div class="breadcrumbs">
+    <a href="{% url 'index' %}">{% trans 'Home' %}</a>
+    {% if title %} &rsaquo; {{ title }}{% endif %}
+  </div>
+{% endblock %}
