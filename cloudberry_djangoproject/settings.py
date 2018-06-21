@@ -48,7 +48,7 @@ INSTALLED_APPS = [
     # extendnetjson: Dependencies for django_netjsonconfig
     'sortedm2m',
     'reversion',
-    'django_admin_ownership.apps.DjangoAdminOwnershipConfig',
+#    'django_admin_ownership.apps.DjangoAdminOwnershipConfig',
     # extendnetjson: This app could be extended the same way as
     # django_netjsonconfig. This has however not been done in this
     # project.
@@ -57,8 +57,10 @@ INSTALLED_APPS = [
     # django_netjsonconfig itself
     'cloudberry_app',
     'django_freeradius',
-    'cloudberry_ownership',
+#    'cloudberry_ownership',
     'cloudberry_auth',
+    'paypal.standard.ipn',
+    'cloudberry_payments',
 ]
 
 MIDDLEWARE = [
@@ -144,7 +146,7 @@ USE_L10N = True
 
 USE_TZ = True
 
-# Django-registration settings
+# cloudberry_accounts
 ACCOUNT_ACTIVATION_DAYS = 7
 REGISTRATION_EMAIL_SUBJECT_PREFIX = '[Cloudberry App]'
 # SEND_ACTIVATION_EMAIL = True
@@ -158,10 +160,14 @@ LOGIN_REDIRECT_URL = '/'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'igcloudberry@gmail.com'
-EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_PASSWORD = 'buy703rise501'
 EMAIL_PORT = 587
 
 REGISTRATION_EMAIL_HTML = False
+
+# cloudberry_payments
+PAYPAL_RECEIVER_EMAIL = 'igcloudberry@gmail.com'
+PAYPAL_TEST = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/

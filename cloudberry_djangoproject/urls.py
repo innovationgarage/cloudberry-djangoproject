@@ -25,15 +25,16 @@ urlpatterns = [
     url(r'^accounts/profile/', TemplateView.as_view(template_name='cloudberry_accounts/profile.html'), name='profile'),
     url(r'^login/', auth_views.login, name='login'),
     url(r'^admin/', admin.site.urls, name='admin'),
+    url(r'^paypal/', include('paypal.standard.ipn.urls')),
+    url(r'^paypal/process/$', TemplateView.as_view(template_name='cloudberry_payments/process.html'), name='payment'),
     url(r'^', include('cloudberry_app.controller.urls', namespace='controller')),
     url(r'^', include('cloudberry_app.urls', namespace='netjsonconfig')),
     url(r'^', include('django_x509.urls', namespace='x509')),
     url(r'^', include('django_freeradius.urls', namespace='freeradius')),
-
 ]
 
 # extendnetjson: django_netjsonconfig requires staticfiles to
 # function, as the admin interface uses custom javascript for the
 # schema-based json editor.
-# from django.contrib.staticfiles.urls import staticfiles_urlpatterns
-# urlpatterns += staticfiles_urlpatterns()
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
+urlpatterns += staticfiles_urlpatterns()
