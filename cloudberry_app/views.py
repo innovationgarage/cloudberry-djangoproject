@@ -55,19 +55,18 @@ def schema_meta(request):
 def download_device_image(request, device):
     device = cloudberry_app.models.Device.objects.get(pk=device)
 
-    image_path = os.path.join(settings.OPENWISP_DEVICE_IMAGES, "%s.img" % device.pk)
-    if not os.path.exists(image_path):
-        if not os.path.exists(os.path.dirname(image_path)):
-            os.makedirs(os.path.dirname(image_path))
-        with open(image_path, "w") as f:
-            with urllib.request.urlopen("%s/%s?OPENWISP_UUID=%s&OPENWISP_KEY=%s&OPENWISP_URL=%s" % (
-                    settings.OPENWISP_DEVICE_IMAGE_URL,
-                    device.os_image,
-                    device.pk,
-                    device.key,
-                    urllib.parse.quote(request.build_absolute_uri(settings.ROOT)))) as f:
-                assert f.getcode() == 200
-
+    if not device.generated_image_id:
+        with urllib.request.urlopen("%s/%s?OPENWISP_UUID=%s&OPENWISP_KEY=%s&OPENWISP_URL=%s" % (
+                settings.OPENWISP_DEVICE_IMAGE_URL,
+                device.os_image,
+                device.pk,
+                device.key,
+                urllib.parse.quote(request.build_absolute_uri(settings.ROOT)))) as f:
+            assert f.getcode() == 200
+            device.generated_image_id = json.load(f)["generated"]
+            device.save()
+            
+    image_path = os.path.join(settings.OPENWISP_DEVICE_IMAGES, device.generated_image_id)
     with open(image_path) as f:
         resp = HttpResponse(f.read(), status=200, content_type='application/binary')
         resp['Content-Disposition'] = 'attachment; filename="%s.img"' % device.pk

@@ -35,6 +35,7 @@ import tablib
 import django.urls
 from copy import deepcopy
 import urllib.request
+import json
 
 class Backend(django_admin_ownership.models.GroupedConfigurationMixin, BaseModel, cloudberry_app.backends.BackendedModelMixin, cloudberry_app.backends.TemplatedBackendModelMixin):
     group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
@@ -180,12 +181,14 @@ class Device(django_admin_ownership.models.GroupedConfigurationMixin, AbstractDe
     def _get_os_images():
         try:
             with urllib.request.urlopen(settings.OPENWISP_DEVICE_IMAGE_URL) as f:
-                return [(row, row) for row in f]
+                return [(image, image) for image in json.load(f)["images"]]
         except Exception as e:
             print(e)
             return []
         
     os_image.choices_fn = _get_os_images
+    
+    generated_image_id = models.CharField(blank=True)
     
     class Meta(AbstractDevice.Meta):
         abstract = False

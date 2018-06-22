@@ -196,8 +196,8 @@ if 'runserver' in sys.argv:
 else:
     ROOT = '/cloudberry'
 
-OPENWISP_DEVICE_IMAGE_URL = "http://localhost:4711"
-OPENWISP_DEVICE_IMAGES = os.path.join(os.path.dirname(os.path.dirname(__file__)), "devices")
+OPENWISP_DEVICE_IMAGE_URL = "http://image-generation:5000"
+OPENWISP_DEVICE_IMAGES = '/images'
     
 local_settings = os.path.join(os.path.dirname(os.path.dirname(__file__)), "local_settings.py")
 if os.path.exists(local_settings):
