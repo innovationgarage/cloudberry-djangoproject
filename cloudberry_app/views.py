@@ -62,8 +62,13 @@ def download_device_image(request, device):
                 device.pk,
                 device.key,
                 urllib.parse.quote(request.build_absolute_uri(settings.ROOT)))) as f:
-            assert f.getcode() == 200
-            device.generated_image_id = json.load(f)["generated"]
+            try:
+                res = json.load(f)
+            except Exception, e:
+                res = {"error": str(e)}
+            if f.getcode() != 200 or 'generated' not in res:
+                return HttpResponse(json.dumps(res), status=500, content_type='text/json')
+            device.generated_image_id = res["generated"]
             device.save()
             
     image_path = os.path.join(settings.OPENWISP_DEVICE_IMAGES, device.generated_image_id)
