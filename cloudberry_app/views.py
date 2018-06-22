@@ -67,10 +67,10 @@ def download_device_image(request, device):
                 res = json.load(f)
             except Exception as e:
                 res = {"error": str(e)}
-            if f.getcode() != 200 or 'generated' not in res:
+            if f.getcode() != 200 or 'output_file' not in res:
                 res["url"] = url
                 return HttpResponse(json.dumps(res), status=500, content_type='text/json')
-            device.generated_image_id = res["generated"]
+            device.generated_image_id = res["output_file"]
             device.save()
             
     image_path = os.path.join(settings.OPENWISP_DEVICE_IMAGES, device.generated_image_id)
