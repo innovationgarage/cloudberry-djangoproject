@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('cloudberry_app', '0002_auto_20180516_1025'),
+        ('cloudberry_app', '0001_initial'),
     ]
 
     operations = [
