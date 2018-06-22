@@ -65,7 +65,7 @@ def download_device_image(request, device):
         with urllib.request.urlopen(url) as f:
             try:
                 res = json.load(f)
-            except Exception, e:
+            except Exception as e:
                 res = {"error": str(e)}
             if f.getcode() != 200 or 'generated' not in res:
                 res["url"] = url
