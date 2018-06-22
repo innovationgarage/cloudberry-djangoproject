@@ -56,17 +56,19 @@ def download_device_image(request, device):
     device = cloudberry_app.models.Device.objects.get(pk=device)
 
     if not device.generated_image_id:
-        with urllib.request.urlopen("%s/%s?OPENWISP_UUID=%s&OPENWISP_KEY=%s&OPENWISP_URL=%s" % (
-                settings.OPENWISP_DEVICE_IMAGE_URL,
-                device.os_image,
-                device.pk,
-                device.key,
-                urllib.parse.quote(request.build_absolute_uri(settings.ROOT)))) as f:
+        url = "%s/%s?OPENWISP_UUID=%s&OPENWISP_KEY=%s&OPENWISP_URL=%s" % (
+            settings.OPENWISP_DEVICE_IMAGE_URL,
+            device.os_image,
+            device.pk,
+            device.key,
+            urllib.parse.quote(request.build_absolute_uri(settings.ROOT)))
+        with urllib.request.urlopen(url) as f:
             try:
                 res = json.load(f)
             except Exception, e:
                 res = {"error": str(e)}
             if f.getcode() != 200 or 'generated' not in res:
+                res["url"] = url
                 return HttpResponse(json.dumps(res), status=500, content_type='text/json')
             device.generated_image_id = res["generated"]
             device.save()
