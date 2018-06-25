@@ -74,7 +74,7 @@ def download_device_image(request, device):
         return HttpResponse(json.dumps(res), status=500, content_type='text/json')
 
     image_path = os.path.join(settings.OPENWISP_DEVICE_IMAGES, res["output_file"])
-    with open(image_path) as f:
+    with open(image_path, 'rb') as f:
         resp = HttpResponse(f.read(), status=200, content_type='application/binary')
         resp['Content-Disposition'] = 'attachment; filename="%s.img"' % device.pk
 
