@@ -5,6 +5,15 @@ import django.contrib.admin
 import django.contrib.admin.utils
 import django.db.models
 
+try:
+    import django_global_request.middleware
+    def get_current_user():
+        request = django_global_request.middleware.get_request()
+        return request and request.user
+except:
+    def get_current_user():
+        return None
+
 def patch(obj):
     def patch(fn):
         is_classmethod = isinstance(fn, classmethod)
@@ -35,19 +44,26 @@ def row_access(Model, admin):
         AdminModel.fields[1:1] = Model._configuration_group[:1]
     
     def _row_access_read_filter(Model, user, prefix=0):
-        return {"__".join(Model._configuration_group[prefix:] + ["read", "user"]): user}
+        filter = django.db.models.Q(**{"__".join(Model._configuration_group[prefix:] + ["read", "user"]): user})
+        filter = filter | django.db.models.Q(**{"__".join(Model._configuration_group[prefix:] + ["owner"]): user})
+        if hasattr(Model, 'owner'):
+            filter = filter | django.db.models.Q(owner = user)
+        return filter
 
     def _row_access_write_filter(Model, user, prefix=0):
-        return {"__".join(Model._configuration_group[prefix:] + ["write", "user"]): user}
-
+        filter = django.db.models.Q(**{"__".join(Model._configuration_group[prefix:] + ["write", "user"]): user})
+        filter = filter | django.db.models.Q(**{"__".join(Model._configuration_group[prefix:] + ["owner"]): user})
+        if hasattr(Model, 'owner'):
+            filter = filter | django.db.models.Q(owner = user)
+        return filter
 
     @patch(Model)
     @classmethod
     def objects_allowed_to(cls, orig, queryset, read=None, write=None, **kw):
         if read is not None and not read.is_superuser:
-            queryset = queryset.filter(**_row_access_read_filter(Model, read, **kw))
+            queryset = queryset.filter(_row_access_read_filter(Model, read, **kw))
         if write is not None and not write.is_superuser:
-            queryset = queryset.filter(**_row_access_write_filter(Model, write, **kw))
+            queryset = queryset.filter(_row_access_write_filter(Model, write, **kw))
         return queryset
 
     @patch(AdminModel)
@@ -61,13 +77,21 @@ def row_access(Model, admin):
     @patch(Model)
     def allowed_to_change(self, orig, user):
         if user.is_superuser: return True
+        if hasattr(self, 'owner') and self.owner == user:
+            return True
         obj1 = getattr(self, Model._configuration_group[0])
+        if obj1 is None:
+            return False
         return obj1.objects_allowed_to(type(obj1).objects.filter(id=obj1.id), write=user, prefix=1).count() > 0
 
     @patch(Model)
     def allowed_to_read(self, orig, user):
         if user.is_superuser: return True
+        if hasattr(Model, '_configuration_owner') and getattr(self, Model._configuration_owner) == user:
+            return True
         obj1 = getattr(self, Model._configuration_group[0])
+        if obj1 is None:
+            return False
         return obj1.objects_allowed_to(type(obj1).objects.filter(id=obj1.id), read=user, prefix=1).count() > 0
 
     @patch(AdminModel)
@@ -108,6 +132,8 @@ def row_access(Model, admin):
 
     @patch(AdminModel)
     def save_model(self, orig, request, obj, form, change):
+        if hasattr(obj, 'owner') and obj.owner is None:
+            obj.owner = get_current_user()
         if not self._has_change_permission(request, obj):
             raise Exception("Action not allowed")
         orig(self, request, obj, form, change)
