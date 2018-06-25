@@ -188,8 +188,6 @@ class Device(django_admin_ownership.models.GroupedConfigurationMixin, AbstractDe
         
     os_image.choices_fn = _get_os_images
     
-    generated_image_id = models.CharField(max_length=256, blank=True)
-    
     class Meta(AbstractDevice.Meta):
         abstract = False
 

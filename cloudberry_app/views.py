@@ -55,25 +55,25 @@ def schema_meta(request):
 def download_device_image(request, device):
     device = cloudberry_app.models.Device.objects.get(pk=device)
 
-    if not device.generated_image_id:
-        url = "%s/%s?OPENWISP_UUID=%s&OPENWISP_KEY=%s&OPENWISP_URL=%s" % (
-            settings.OPENWISP_DEVICE_IMAGE_URL,
-            device.os_image,
-            device.pk,
-            device.key,
-            urllib.parse.quote(request.build_absolute_uri(settings.ROOT)))
-        with urllib.request.urlopen(url) as f:
-            try:
-                res = json.load(f)
-            except Exception as e:
-                res = {"error": str(e)}
-            if f.getcode() != 200 or 'output_file' not in res:
-                res["url"] = url
-                return HttpResponse(json.dumps(res), status=500, content_type='text/json')
-            device.generated_image_id = res["output_file"]
-            device.save()
-            
-    image_path = os.path.join(settings.OPENWISP_DEVICE_IMAGES, device.generated_image_id)
+    url = "%s/%s?OPENWISP_UUID=%s&OPENWISP_KEY=%s&OPENWISP_URL=%s" % (
+        settings.OPENWISP_DEVICE_IMAGE_URL,
+        device.os_image,
+        device.pk,
+        device.key,
+        urllib.parse.quote(request.build_absolute_uri(settings.ROOT)))
+
+    with urllib.request.urlopen(url) as f:
+        status = f.getcode()
+        try:
+            res = json.load(f)
+        except Exception as e:
+            res = {"error": str(e)}
+
+    if status != 200 or 'output_file' not in res:
+        res["url"] = url
+        return HttpResponse(json.dumps(res), status=500, content_type='text/json')
+
+    image_path = os.path.join(settings.OPENWISP_DEVICE_IMAGES, res["output_file"])
     with open(image_path) as f:
         resp = HttpResponse(f.read(), status=200, content_type='application/binary')
         resp['Content-Disposition'] = 'attachment; filename="%s.img"' % device.pk
