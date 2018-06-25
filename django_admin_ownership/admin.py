@@ -33,6 +33,12 @@ class GroupAdmin(import_export.admin.ImportExportMixin,
     resource_class = django_admin_ownership.importexport.GroupResource
     formats=(cloudberry_import_export.JSON_FORMAT,)
 
+    def get_form(self, request, obj=None, **kwargs):
+        self.exclude = []
+        if not request.user.is_superuser:
+            self.exclude.append('permissions')
+        return super(GroupAdmin, self).get_form(request, obj, **kwargs)
+
 django.contrib.admin.site.unregister(django.contrib.auth.models.Group)
 django.contrib.admin.site.register(django.contrib.auth.models.Group, GroupAdmin)
 

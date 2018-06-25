@@ -2,6 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+import django.contrib.auth.models
 
 try:
     import django_global_request.middleware
@@ -53,3 +54,10 @@ class ConfigurationGroup(models.Model):
         
     def __str__(self):
         return self.name
+
+django.contrib.auth.models.Group.add_to_class(
+    'group', models.ForeignKey(ConfigurationGroup,
+                               blank=True,
+                               null=True,
+                               on_delete=models.CASCADE, related_name='group_for_user_group'))
+django.contrib.auth.models.Group._configuration_group = ["group"]
