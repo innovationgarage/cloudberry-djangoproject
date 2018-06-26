@@ -27,6 +27,11 @@ class RadiusAccounting(AbstractRadiusAccounting):
                                      db_column='AcctStopDelay',
                                      null=True,
                                      blank=True)
+    x_ascend_session_svr_key = models.CharField(verbose_name=_('realm'),
+                                                db_column='XAscendSessionSvrKey',
+                                                max_length=10,
+                                                null=True,
+                                                blank=True)
         
 class RadiusReply(AbstractRadiusReply):
     pass
