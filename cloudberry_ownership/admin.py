@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from django_freeradius.base.admin import AbstractNasAdmin
-from django_freeradius.models import Nas
+from cloudberry_radius.models import Nas
 
 admin.site.unregister(Nas)
 

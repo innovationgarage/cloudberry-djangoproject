@@ -56,7 +56,7 @@ INSTALLED_APPS = [
     # extendnetjson: Include your extension app here, not
     # django_netjsonconfig itself
     'cloudberry_app',
-    'django_freeradius',
+    'cloudberry_radius',
     'cloudberry_ownership',
     'cloudberry_auth',
 ]
@@ -198,7 +198,18 @@ else:
 
 OPENWISP_DEVICE_IMAGE_URL = "http://image-generation:5000"
 OPENWISP_DEVICE_IMAGES = '/images'
-    
+
+import importlib
+for app in INSTALLED_APPS:
+    try:
+        app_settings = importlib.import_module('%s.settings' % app)
+    except ModuleNotFoundError:
+        pass
+    else:
+        for name in dir(app_settings):
+            if not name.startswith('_'):
+                locals()[name] = getattr(app_settings, name)
+                
 local_settings = os.path.join(os.path.dirname(os.path.dirname(__file__)), "local_settings.py")
 if os.path.exists(local_settings):
     with open(local_settings) as f:

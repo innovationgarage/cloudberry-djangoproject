@@ -1,0 +1,11 @@
+DJANGO_FREERADIUS_RADIUSGROUP_MODEL = "cloudberry_radius.RadiusGroup"
+DJANGO_FREERADIUS_RADIUSGROUPUSERS_MODEL = "cloudberry_radius.RadiusGroupUsers"
+DJANGO_FREERADIUS_RADIUSCHECK_MODEL = "cloudberry_radius.RadiusCheck"
+DJANGO_FREERADIUS_RADIUSACCOUNTING_MODEL = "cloudberry_radius.RadiusAccounting"
+DJANGO_FREERADIUS_RADIUSREPLY_MODEL = "cloudberry_radius.RadiusReply"
+DJANGO_FREERADIUS_NAS_MODEL = "cloudberry_radius.Nas"
+DJANGO_FREERADIUS_RADIUSGROUPCHECK_MODEL = "cloudberry_radius.RadiusGroupCheck"
+DJANGO_FREERADIUS_RADIUSGROUPREPLY_MODEL = "cloudberry_radius.RadiusGroupReply"
+
+DJANGO_FREERADIUS_RADIUSPOSTAUTH_MODEL = "cloudberry_radius.RadiusPostAuth"
+DJANGO_FREERADIUS_RADIUSUSERGROUP_MODEL = "cloudberry_radius.RadiusUserGroup"

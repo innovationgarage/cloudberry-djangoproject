@@ -10,12 +10,12 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('cloudberry_ownership', '0001_cagroup'),
-        ('django_freeradius', '0014_auto_20171226_1938')
+        ('cloudberry_radius', '0001_initial')
     ]
 
     operations = [
         WithAppLabelOperation(
-            'django_freeradius',
+            'cloudberry_radius',
             migrations.AddField(
                 model_name='nas',
                 name='group',
