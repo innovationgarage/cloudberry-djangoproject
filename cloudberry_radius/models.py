@@ -1,5 +1,6 @@
 from django.db import models
 from swapper import swappable_setting
+from django.utils.translation import ugettext_lazy as _
 
 from django_freeradius.base.models import (
     AbstractNas, AbstractRadiusAccounting, AbstractRadiusCheck, AbstractRadiusGroup,
@@ -18,8 +19,15 @@ class RadiusCheck(AbstractRadiusCheck):
     pass
 
 class RadiusAccounting(AbstractRadiusAccounting):
-    pass
-
+    start_delay = models.IntegerField(verbose_name=_('Start delay'),
+                                      db_column='AcctStartDelay',
+                                      null=True,
+                                      blank=True)
+    stop_delay = models.IntegerField(verbose_name=_('Stop delay'),
+                                     db_column='AcctStopDelay',
+                                     null=True,
+                                     blank=True)
+        
 class RadiusReply(AbstractRadiusReply):
     pass
 
