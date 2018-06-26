@@ -13,11 +13,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='radiusaccounting',
             name='start_delay',
-            field=models.IntegerField(blank=True, db_column='AcctStartDelay', null=True, verbose_name='Start delay'),
+            field=models.IntegerField(blank=True, db_column='acctstartdelay', null=True, verbose_name='Start delay'),
         ),
         migrations.AddField(
             model_name='radiusaccounting',
             name='stop_delay',
-            field=models.IntegerField(blank=True, db_column='AcctStopDelay', null=True, verbose_name='Stop delay'),
+            field=models.IntegerField(blank=True, db_column='acctstopdelay', null=True, verbose_name='Stop delay'),
+        ),
+        migrations.AddField(
+            model_name='radiusaccounting',
+            name='x_ascend_session_svr_key',
+            field=models.CharField(blank=True, db_column='xascendsessionsvrkey', max_length=10, null=True, verbose_name='realm'),
         ),
     ]

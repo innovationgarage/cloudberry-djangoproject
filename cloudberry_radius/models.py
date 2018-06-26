@@ -20,15 +20,15 @@ class RadiusCheck(AbstractRadiusCheck):
 
 class RadiusAccounting(AbstractRadiusAccounting):
     start_delay = models.IntegerField(verbose_name=_('Start delay'),
-                                      db_column='AcctStartDelay',
+                                      db_column='acctstartdelay',
                                       null=True,
                                       blank=True)
     stop_delay = models.IntegerField(verbose_name=_('Stop delay'),
-                                     db_column='AcctStopDelay',
+                                     db_column='acctstopdelay',
                                      null=True,
                                      blank=True)
     x_ascend_session_svr_key = models.CharField(verbose_name=_('realm'),
-                                                db_column='XAscendSessionSvrKey',
+                                                db_column='xascendsessionsvrkey',
                                                 max_length=10,
                                                 null=True,
                                                 blank=True)
