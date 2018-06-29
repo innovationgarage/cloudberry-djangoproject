@@ -8,6 +8,8 @@ from django_freeradius.base.models import (
     AbstractRadiusReply, AbstractRadiusUserGroup,
 )
 
+import cloudberry_app.models
+import django.contrib.auth.models
 
 class RadiusGroup(AbstractRadiusGroup):
     pass
@@ -18,7 +20,18 @@ class RadiusGroupUsers(AbstractRadiusGroupUsers):
 class RadiusCheck(AbstractRadiusCheck):
     pass
 
+from django.db.models.signals import class_prepared
+def remove_field(sender, **kwargs):
+    if sender.__name__ == "RadiusAccounting" and hasattr(sender, 'user'):
+        sender._meta.local_fields.remove(sender.user.field)
+class_prepared.connect(remove_field)
+
 class RadiusAccounting(AbstractRadiusAccounting):
+    user = models.ForeignKey(django.contrib.auth.models.User,
+                             to_field="username",
+                             db_column="username",
+                             on_delete=models.CASCADE)
+    
     start_delay = models.IntegerField(verbose_name=_('Start delay'),
                                       db_column='acctstartdelay',
                                       null=True,
@@ -32,7 +45,13 @@ class RadiusAccounting(AbstractRadiusAccounting):
                                                 max_length=10,
                                                 null=True,
                                                 blank=True)
-        
+    
+    device = models.ForeignKey(cloudberry_app.models.Device,
+                               db_column='nasidentifier',
+                               on_delete=models.CASCADE,
+                               null=True,
+                               blank=True)
+
 class RadiusReply(AbstractRadiusReply):
     pass
 
