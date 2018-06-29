@@ -20,17 +20,17 @@ class RadiusGroupUsers(AbstractRadiusGroupUsers):
 class RadiusCheck(AbstractRadiusCheck):
     pass
 
-from django.db.models.signals import class_prepared
-def remove_field(sender, **kwargs):
-    if sender.__name__ == "RadiusAccounting" and hasattr(sender, 'user'):
-        sender._meta.local_fields.remove(sender.user.field)
-class_prepared.connect(remove_field)
-
 class RadiusAccounting(AbstractRadiusAccounting):
+    @property
+    def username(self):
+        return self.user.username
+    
     user = models.ForeignKey(django.contrib.auth.models.User,
                              to_field="username",
                              db_column="username",
-                             on_delete=models.CASCADE)
+                             on_delete=models.CASCADE,
+                             null=True,
+                             blank=True)
     
     start_delay = models.IntegerField(verbose_name=_('Start delay'),
                                       db_column='acctstartdelay',

@@ -1,8 +1,5 @@
 from django.conf.urls import include, url
 
-from django_freeradius.api import urls as api
-
+#  API is broken, disable for now
 app_name = 'freeradius'
-urlpatterns = [
-    url(r'^api/', include(api)),
-]
+urlpatterns = []
