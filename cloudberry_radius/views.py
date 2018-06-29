@@ -11,6 +11,9 @@ from paypal.utils import warn_untested
 
 from django.shortcuts import render
 import django.db.models
+import django.db.models
+import cloudberry_radius.models
+import django_admin_ownership.models
 
 def account_balance(request):
     return render(request,
@@ -18,6 +21,23 @@ def account_balance(request):
                   {'balance': request.user.radius_accounting.all().aggregate(django.db.models.Sum('amount'))['amount__sum'],
                    'accounting': request.user.radius_accounting.all().order_by('-start_time')})
 
+def device_owner_account_balance(request):
+    groups = django_admin_ownership.models.ConfigurationGroup.objects.filter(
+        django.db.models.Q(owner=request.user)
+        | django.db.models.Q(write__user=request.user))
+
+    res = []
+    for group in groups:
+        accounting = cloudberry_radius.models.RadiusAccounting.objects.filter(
+            django.db.models.Q(device__group=group)
+            | django.db.models.Q(withdrawal_group=group))
+        res.append({'group': group,
+                    'balance': -accounting.aggregate(django.db.models.Sum('amount'))['amount__sum'],
+                    'accounting': accounting.order_by('-start_time')})
+        
+    return render(request,
+                  'cloudberry_radius/device_owner_account_balance.html',
+                  {'accountings': res})
 @require_GET
 def pdt(request, template="cloudberry_order/done.html", context=None):
     """Standard implementation of a view that processes PDT and then renders a template

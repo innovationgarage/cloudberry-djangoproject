@@ -165,10 +165,20 @@ class RadiusAccounting(models.Model):
                                null=True,
                                blank=True,
                                related_name='radius_accounting')
+    withdrawal_group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
+                                         on_delete=models.CASCADE,
+                                         null=True,
+                                         blank=True,
+                                         related_name='withdrawals')
     amount = models.FloatField(verbose_name=_('Amount'),
                                db_column='amount',
                                null=True,
                                blank=True)
+
+    @property
+    def neg_amount(self):
+        if self.amount is None: return None
+        return -self.amount
 
     @property
     def duration(self):
