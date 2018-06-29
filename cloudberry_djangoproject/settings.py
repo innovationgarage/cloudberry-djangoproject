@@ -59,7 +59,6 @@ INSTALLED_APPS = [
     'cloudberry_radius',
     'cloudberry_ownership',
     'cloudberry_auth',
-    'cloudberry_order',
     'paypal.standard.pdt',
 ]
 

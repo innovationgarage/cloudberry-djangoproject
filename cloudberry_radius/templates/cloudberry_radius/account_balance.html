@@ -12,6 +12,23 @@
     <span style='font-size: 48pt; {% if balance > 0 %}background: #eeffee; color: #00aa00;{% else %}background: #ffeeee; color: #aa0000;{% endif %}'>{{balance}}</span>
   </div>
 
+  <form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" style="margin-bottom: 20pt;">
+    <!-- <input type="hidden" name="pdt-magic-return-url" value="{% url 'cloudberry_radius:account_balance' %}" /> -->
+    <input type="hidden" name="business" value="igcloudberry@gmail.com">
+    <input type="hidden" name="cmd" value="_xclick">
+    <input type="hidden" name="item_name" value="Cloudberry Points">
+    <input type="hidden" name="currency_code" value="USD">
+
+    <input type="hidden" name="on0" value="strong>quantity">
+    Enter the number of Cloudberry Points:
+    <input type="number" name="amount" placeholder="10" step="1" min="0">
+    <span class="validity"></span>
+
+    <input type="image" name="submit" border="0" src="https://www.paypalobjects.com/en_US/i/btn/btn_buynow_LG.gif"
+      alt="Buy Now">
+    <img alt="" border="0" width="1" height="1" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" >
+  </form>
+  
   {% if accounting %}
     <table>
       <tr>

@@ -25,7 +25,6 @@ urlpatterns = [
     url(r'^accounts/profile/', TemplateView.as_view(template_name='cloudberry_accounts/profile.html'), name='profile'),
     url(r'^login/', auth_views.login, name='login'),
     url(r'^admin/', admin.site.urls, name='admin'),
-    url(r'^', include('cloudberry_order.urls', namespace='order')),
     url(r'^', include('cloudberry_app.controller.urls', namespace='controller')),
     url(r'^', include('cloudberry_app.urls', namespace='netjsonconfig')),
     url(r'^', include('django_x509.urls', namespace='x509')),
