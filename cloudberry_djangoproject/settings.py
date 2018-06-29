@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'fullurl',
     # extendnetjson: Dependencies for django_netjsonconfig
     'sortedm2m',
     'reversion',
@@ -196,6 +197,12 @@ PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.BCryptSHA256PasswordHasher',
     'django.contrib.auth.hashers.BCryptPasswordHasher'
 ]
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+     # ...
+     'django.core.context_processors.request',
+     # ...
+    )
 
 if 'runserver' in sys.argv:
     ROOT = ''

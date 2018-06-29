@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load fullurl %}
 
 {% block title %}Django Registration Test App{% endblock %}
 
@@ -13,7 +14,7 @@
   </div>
 
   <form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" style="margin-bottom: 20pt;">
-    <!-- <input type="hidden" name="pdt-magic-return-url" value="{% url 'cloudberry_radius:account_balance' %}" /> -->
+    <INPUT TYPE="hidden" NAME="return" value="{% fullurl 'cloudberry_radius:payment_done' %}">
     <input type="hidden" name="business" value="igcloudberry@gmail.com">
     <input type="hidden" name="cmd" value="_xclick">
     <input type="hidden" name="item_name" value="Cloudberry Points">
