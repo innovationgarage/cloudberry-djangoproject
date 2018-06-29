@@ -6,7 +6,12 @@
 {% block content %}
 
   <h1>Data usage & account balance</h1>
-        
+
+  <div style="margin-bottom: 20pt;">
+    <span style='font-size: 48pt;'>Current balance:</span>
+    <span style='font-size: 48pt; {% if balance > 0 %}background: #eeffee; color: #00aa00;{% else %}background: #ffeeee; color: #aa0000;{% endif %}'>{{balance}}</span>
+  </div>
+
   {% if accounting %}
     <table>
       <tr>
