@@ -4,5 +4,33 @@
 {% block title %}Account Profile{% endblock %}
 
 {% block content %}
+
+  <!-- FIXME! Sandbox payment only! --> 
+<form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post">
+
+  <!-- Identify your business so that you can collect the payments. -->
+  <input type="hidden" name="business" value="igcloudberry@gmail.com">
+
+  <!-- Specify a Buy Now button. -->
+  <input type="hidden" name="cmd" value="_xclick">
+
+  <!-- Specify details about the item that buyers will purchase. -->
+  <input type="hidden" name="item_name" value="Cloudberry Points">
+  <input type="hidden" name="currency_code" value="USD">
+
+  <!-- Provide the buyer with a text box option field. -->
+  <input type="hidden" name="on0" value="strong>quantity">Enter the number of Cloudberry Points <br />
+  <input type="number" name="amount" placeholder="10" step="1" min="0"> <br />
+  <span class="validity"></span>
+
+  <!-- Display the payment button. -->
+  <input type="image" name="submit" border="0"
+    src="https://www.paypalobjects.com/en_US/i/btn/btn_buynow_LG.gif"
+    alt="Buy Now">
+  <img alt="" border="0" width="1" height="1"
+    src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" >
+
+</form>
+
 {% endblock %}
 

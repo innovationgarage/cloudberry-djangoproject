@@ -60,6 +60,7 @@ INSTALLED_APPS = [
     'cloudberry_ownership',
     'cloudberry_auth',
     'cloudberry_order',
+    'paypal.standard.pdt',
 ]
 
 MIDDLEWARE = [
@@ -158,11 +159,16 @@ LOGIN_REDIRECT_URL = '/'
 # email verification
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_HOST_USER = 'igcloudberry@gmail.com'
-EMAIL_HOST_PASSWORD = ''
+#EMAIL_HOST_USER = ''
+#EMAIL_HOST_PASSWORD = ''
 EMAIL_PORT = 587
 
 REGISTRATION_EMAIL_HTML = False
+
+# paypal
+PAYPAL_TEST = True
+#PAYPAL_RECEIVER_EMAIL = ''
+#PAYPAL_IDENTITY_TOKEN = ''
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.0/howto/static-files/
@@ -201,10 +207,14 @@ OPENWISP_DEVICE_IMAGE_URL = "http://image-generation:5000"
 OPENWISP_DEVICE_IMAGES = '/images'
 
 import importlib
+try:
+    NoModErr = ModuleNotFoundError
+except:
+    NoModErr = ImportError
 for app in INSTALLED_APPS:
     try:
         app_settings = importlib.import_module('%s.settings' % app)
-    except ModuleNotFoundError:
+    except NoModErr:
         pass
     else:
         for name in dir(app_settings):
