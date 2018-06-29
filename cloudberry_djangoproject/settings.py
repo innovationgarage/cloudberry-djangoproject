@@ -30,6 +30,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'dualog_style',
     'cloudberry_accounts',
     'import_export',
     'django_import_export_cli',
