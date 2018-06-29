@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Django Registration Test App{% endblock %}
+
+{% block content %}
+
+  <h1>Customer data usage & account balance</h1>
+
+  {% for group in accountings %}
+
+    <h2>{{group.group}}</h2>
+
+    <div style="margin-bottom: 20pt;">
+      <span style='font-size: 18pt;'>Current balance:</span>
+      <span style='font-size: 18pt; {% if group.balance > 0 %}background: #eeffee; color: #00aa00;{% else %}background: #ffeeee; color: #aa0000;{% endif %}'>{{group.balance}}</span>
+    </div>
+
+    {% if group.accounting %}
+      <table>
+        <tr>
+          <th>User</th>
+          <th>Time</th>
+          <th>Amount</th>
+          <th>Duartion</th>
+          <th>Input (Bytes)</th>
+          <th>Output (Bytes)</th>
+          <th>Your IP-address</th>
+          <th>Access point ID</th>
+          <th>Access point group</th>
+        </tr>
+        {% for row in group.accounting %}
+        <tr>
+            <td>{{row.user|default_if_none:""}}</td>
+            <td>{{row.start_time|default_if_none:""}}</td>
+            <td>{{row.neg_amount|default_if_none:""}}</td>
+            <td>{{row.duration|default_if_none:""}}</td>
+            <td>{{row.input_octets|default_if_none:""}}</td>
+            <td>{{row.output_octets|default_if_none:""}}</td>
+            <td>{{row.framed_ip_address|default_if_none:""}}</td>
+            <td>{{row.device.id|default_if_none:""}}</td>
+            <td>{{row.device.group.name|default_if_none:""}}</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+        <p>You have not used any data yet.</p>
+    {% endif %}
+  {% endfor %}
+
+{% endblock %}
+
