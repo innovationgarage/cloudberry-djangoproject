@@ -6,7 +6,7 @@ from django_freeradius.base.admin import (
     AbstractRadiusPostAuthAdmin, AbstractRadiusReplyAdmin, AbstractRadiusUserGroupAdmin,
 )
 from cloudberry_radius.models import (
-    Nas, RadiusAccounting, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
+    Nas, RadiusAccounting, Pricing, RadiusCheck, RadiusGroup, RadiusGroupCheck, RadiusGroupReply, RadiusGroupUsers,
     RadiusPostAuth, RadiusReply, RadiusUserGroup,
 )
 
@@ -32,9 +32,17 @@ class RadiusReplyAdmin(AbstractRadiusReplyAdmin):
 
 
 @admin.register(RadiusAccounting)
-class RadiusAccountingAdmin(AbstractRadiusAccountingAdmin):
-    pass
+class RadiusAccountingAdmin(admin.ModelAdmin):
+    list_display = ('user', 'start_time', 'amount', 'duration', 'input_octets', 'output_octets', 'framed_ip_address', 'device_id', 'device_group_name')
+    list_display_links = list_display
+    search_fields = ('username', 'device_id')
+    list_filter = ('start_time', 'stop_time')    
 
+@admin.register(Pricing)
+class AuthorAdmin(admin.ModelAdmin):
+    readonly_fields=('latest',)
+    list_display = ('latest', 'timestamp', 'group', 'cost_per_byte')
+    list_display_links = list_display
 
 @admin.register(Nas)
 class NasAdmin(AbstractNasAdmin):

@@ -1,9 +1,9 @@
-from __future__ import unicode_literals
+from django.conf.urls import include, url, re_path
 
-from django.conf.urls import url
-
+import cloudberry_order.views
 from paypal.standard.pdt import views
 
+app_name = 'cloudberry_orders'
 urlpatterns = [
     url(r'^$', views.pdt, name="paypal-pdt"),
 ]

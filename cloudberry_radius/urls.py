@@ -1,8 +1,9 @@
-from django.conf.urls import include, url
+from django.conf.urls import include, url, re_path
 
-from django_freeradius.api import urls as api
+import cloudberry_radius.views
 
-app_name = 'freeradius'
+#  API is broken, disable for now
+app_name = 'cloudberry_radius'
 urlpatterns = [
-    url(r'^api/', include(api)),
+    re_path(r'^cloudberry_radius/account_balance', cloudberry_radius.views.account_balance, name='account_balance'),
 ]
