@@ -37,7 +37,6 @@ odfpy==1.3.6
 openpyxl==2.5.4
 openwisp-utils==0.2
 passlib==1.7.1
-pkg-resources==0.0.0
 pycparser==2.18
 pyleri==1.1.8
 pyOpenSSL==17.5.0
