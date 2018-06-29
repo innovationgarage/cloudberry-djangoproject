@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Django Registration Test App{% endblock %}
+
+{% block content %}
+
+  <h1>Data usage & account balance</h1>
+        
+  {% if accounting %}
+    <table>
+      <tr>
+        <th>Time</th>
+        <th>Amount</th>
+        <th>Duartion</th>
+        <th>Input (Bytes)</th>
+        <th>Output (Bytes)</th>
+        <th>Your IP-address</th>
+        <th>Access point ID</th>
+        <th>Access point group</th>
+      </tr>
+      {% for row in accounting %}
+        <tr>
+          <td>{{row.start_time|default_if_none:""}}</td>
+          <td>{{row.amount|default_if_none:""}}</td>
+          <td>{{row.duration|default_if_none:""}}</td>
+          <td>{{row.input_octets|default_if_none:""}}</td>
+          <td>{{row.output_octets|default_if_none:""}}</td>
+          <td>{{row.framed_ip_address|default_if_none:""}}</td>
+          <td>{{row.device.id|default_if_none:""}}</td>
+          <td>{{row.device.group.name|default_if_none:""}}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+      <p>You have not used any data yet.</p>
+  {% endif %}
+
+{% endblock %}
+
