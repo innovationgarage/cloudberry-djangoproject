@@ -1,8 +1,26 @@
 {% extends "base.html" %}
-{% load i18n %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static "admin/css/dashboard.css" %}" />{% endblock %}
+{% block coltype %}colMS{% endblock %}
+{% block bodyclass %}{{ block.super }} dashboard{% endblock %}
 
 {% block title %}Django Registration Test App{% endblock %}
-
 {% block content %}
+<div id="content" class="colMS">
+  <h1>Welcome to Cloudberry</h1>
+  <div id="content-main">
+    <div class="app-cloudberry_radius module">
+      <table>
+        <caption>
+          <a href="{% url 'cloudberry_radius:account_balance' %}" class="section" title="Quota & balance">Quota & balance</a>
+        </caption>
+        <tbody><tr class="account-balance">
+          <th scope="row"><a href="{% url 'cloudberry_radius:account_balance' %}">Account balance</a></th>
+          <td><a href="{% url 'cloudberry_radius:account_balance' %}?buy=10" class="addlink">Top up</a></td>
+          <td></td>
+        </tr></tbody>
+      </table>
+    </div>
+  </div>
 {% endblock %}
-

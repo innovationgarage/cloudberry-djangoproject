@@ -3,6 +3,13 @@
 
 {% block title %}Django Registration Test App{% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'index' %}">{% trans 'Home' %}</a>
+&rsaquo; Account balance
+</div>
+{% endblock %}
+
 {% block content %}
 
   <h1>Data usage & account balance</h1>
