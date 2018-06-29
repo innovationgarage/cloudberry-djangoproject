@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 
 from warnings import warn
 
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.decorators.http import require_GET
 
 from paypal.standard.pdt.forms import PayPalPDTForm
@@ -14,6 +14,8 @@ import django.db.models
 import django.db.models
 import cloudberry_radius.models
 import django_admin_ownership.models
+
+from .models import RadiusAccounting
 
 def account_balance(request):
     return render(request,
@@ -48,10 +50,15 @@ def pdt(request, template="cloudberry_order/done.html", context=None):
          DeprecationWarning)
     pdt_obj, failed = process_pdt(request)
 
-    context = context or {}
-    context.update({"failed": failed, "pdt_obj": pdt_obj})
-    return render(request, template, context)
-
+    if failed:
+        contect = failed
+        return render(request, template, context)
+    else:
+        a = RadiusAccounting()
+        a.amount = pdt_obj.amt
+        a.user = request.user
+        a.save()
+        return redirect('cloudberry_radius:account_balance')
 
 def process_pdt(request):
     """
