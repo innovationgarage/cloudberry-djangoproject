@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block title %}Django Registration Test App{% endblock %}
+
+{% block content %}
+
+  <div>
+    <div style='display: table-cell'>
+      <h1>Data usage</h1>
+        
+  {% if accounting %}
+    <table>
+      <tr>
+        <th>Start</th>
+        <th>Stop</th>
+        <th>Input (Bytes)</th>
+        <th>Output (Bytes)</th>
+        <th>Your IP-address</th>
+        <th>Access point ID</th>
+        <th>Access point group</th>
+      </tr>
+      {% for row in accounting %}
+        <tr>
+          <td>{{row.start_time}}</td>
+          <td>{{row.stop_time}}</td>
+          <td>{{row.input_octets}}</td>
+          <td>{{row.output_octets}}</td>
+          <td>{{row.framed_ip_address}}</td>
+          <td>{{row.device.id}}</td>
+          <td>{{row.device.group.name}}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+      <p>You have not used any data yet.</p>
+  {% endif %}
+
+    </div>
+    <div style='display: table-cell; padding-left: 40pt;'>
+      <h1>Quota</h1>
+
+  {% if orders %}
+    <table>
+      <tr>
+        <th>Timestamp</th>
+        <th>Quantity</th>
+      </tr>
+      {% for row in orders %}
+        <tr>
+          <td>{{row.timestamp}}</td>
+          <td>{{row.quantity}}</td>
+        </tr>
+      {% endfor %}
+    </table>
+  {% else %}
+      <p>You have bought any data yet.</p>
+  {% endif %}
+
+    </div>
+  </div>
+      
+{% endblock %}
+

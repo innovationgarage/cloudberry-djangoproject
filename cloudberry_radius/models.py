@@ -30,7 +30,8 @@ class RadiusAccounting(AbstractRadiusAccounting):
                              db_column="username",
                              on_delete=models.CASCADE,
                              null=True,
-                             blank=True)
+                             blank=True,
+                             related_name='radius_accounting')
     
     start_delay = models.IntegerField(verbose_name=_('Start delay'),
                                       db_column='acctstartdelay',
@@ -50,7 +51,8 @@ class RadiusAccounting(AbstractRadiusAccounting):
                                db_column='nasidentifier',
                                on_delete=models.CASCADE,
                                null=True,
-                               blank=True)
+                               blank=True,
+                               related_name='radius_accounting')
 
 class RadiusReply(AbstractRadiusReply):
     pass
