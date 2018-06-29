@@ -1,0 +1,136 @@
+body {
+    font-family: 'Poppins', sans-serif;
+/*
+    Blue:
+    dark: #02405a
+    light: #3c667a
+    super-light: #ced9de
+
+    Green:
+    Dark: #51c1b7
+super-light: #f2f9f8
+*/
+}
+#site-name a {
+    background: none; // url(../../../static/ui/openwisp/images/openwisp-logo.svg) no-repeat scroll 0 50% / 100%;
+}
+
+#header {
+    background-color: #01405a;
+}
+#header a:link:hover, #header a:visited:hover {
+    color: #51c1b7;
+    border-bottom-color: #51c1b7;
+}
+
+.module table {
+    outline: 2px solid #3c667a;
+}   
+
+div.breadcrumbs, .module h2, .module caption, .inline-group h2, #container .selector-chosen h2 {
+    background-color: #3c667a;
+}
+
+#content-related, #changelist-filter {
+    margin-top: -2px;
+    background: #ced9de !important;
+}
+
+table thead th.sorted .sortoptions a.sortremove:focus:after, table thead th.sorted .sortoptions a.sortremove:hover:after, a:link, a:visited {
+    color: #3c667a;
+}
+
+a:link, a:visited {
+    color: #3c667a;
+}
+thead th {
+    background-color: #3c667a;
+    color: #ffffff;
+}
+thead th a, thead th a:link, thead th a:visited {
+    color: #ffffff;
+}
+.row2 {
+  background-color: #ffffff;
+}
+
+td, th {
+    border-bottom-color: #ced9de;
+}
+
+.button.default, input[type=submit].default, .submit-row input.default,
+.button, input[type=submit], input[type=button], .submit-row input, a.button,
+.button.default:hover, input[type=submit].default:hover, .submit-row input.default:hover,
+.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, a.button:hover {
+    border: 4px solid;
+    height: 43px !important;
+}
+
+.object-tools a,
+.object-tools a:focus, .object-tools a:hover,
+a.deletelink, .submit-row a.deletelink,
+a.deletelink:hover, .submit-row a.deletelink:hover {
+    border: 4px solid;
+}
+
+.button.default, input[type=submit].default, .submit-row input.default, .object-tools a:focus, .object-tools a:hover {
+    background-color: #51c1b7;
+    border-color: #51c1b7;
+}
+.button, input[type=submit], input[type=button], .submit-row input, a.button {
+    background-color: #3c667a;
+    border-color: #3c667a;
+}
+a.deletelink, .submit-row a.deletelink {
+    background-color: #02405a !important;
+    border-color: #02405a;
+}
+
+.button.default:hover, input[type=submit].default:hover, .submit-row input.default:hover {
+    background-color: #51c1b7;
+    border-color: #02405a;
+}
+.button:hover, input[type=submit]:hover, input[type=button]:hover, .submit-row input:hover, a.button:hover {
+    background-color: #3c667a;
+    border-color: #51c1b7;
+}
+a.deletelink:hover, .submit-row a.deletelink:hover {
+    background-color: #02405a !important;
+    border-color: #51c1b7;
+}
+
+
+
+#changelist-filter a, #changelist-filter a:link, #changelist-filter a:visited {
+    color: #02405a;
+}
+
+#changelist-filter li.selected {
+    background-color: #02405a;
+}
+
+#changelist-filter li.selected a {
+    color: #ffffff !important;
+}
+
+#content-related .module h2, #changelist-filter .module h2 {
+    background-color: #3c667a;
+    color: white;
+}
+
+#changelist #toolbar {
+    border-top: none !important;
+    border-bottom: none !important;
+    background: #ced9de !important;
+    color: #3c667a !important;
+}
+
+div.breadcrumbs {
+    color: #51c1b7;
+}
+div.breadcrumbs a:hover {
+    color: #51c1b7;
+}
+.object-tools a:link, .object-tools a:visited {
+  background: #3c667a;
+}
