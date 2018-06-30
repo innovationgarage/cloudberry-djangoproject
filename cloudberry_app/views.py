@@ -55,12 +55,14 @@ def schema_meta(request):
 def download_device_image(request, device):
     device = cloudberry_app.models.Device.objects.get(pk=device)
 
-    url = "%s/%s?OPENWISP_UUID=%s&OPENWISP_KEY=%s&OPENWISP_URL=%s" % (
+    url = "%s/%s?OPENWISP_UUID=%s&OPENWISP_KEY=%s&OPENWISP_URL=%s&SERVER=%s" % (
         settings.OPENWISP_DEVICE_IMAGE_URL,
         device.os_image,
         device.pk,
         device.key,
-        urllib.parse.quote(request.build_absolute_uri(settings.ROOT)))
+        urllib.parse.quote(request.build_absolute_uri(settings.ROOT)),
+        request.META["SERVER_NAME"]
+    )
 
     with urllib.request.urlopen(url) as f:
         status = f.getcode()
