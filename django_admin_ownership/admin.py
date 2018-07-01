@@ -37,8 +37,13 @@ class GroupAdmin(import_export.admin.ImportExportMixin,
         self.exclude = []
         if not request.user.is_superuser:
             self.exclude.append('permissions')
-        return super(GroupAdmin, self).get_form(request, obj, **kwargs)
-
+        form = super(GroupAdmin, self).get_form(request, obj, **kwargs)
+        if not request.user.is_superuser:
+            #import pdb
+            #pdb.set_trace()
+            form.base_fields['group'].required = True
+        return form
+        
 django.contrib.admin.site.unregister(django.contrib.auth.models.Group)
 django.contrib.admin.site.register(django.contrib.auth.models.Group, GroupAdmin)
 
