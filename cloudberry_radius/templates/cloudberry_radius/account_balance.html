@@ -42,9 +42,10 @@
       <tr>
         <th>Time</th>
         <th>Amount</th>
+        <th></th>
         <th>Duartion</th>
-        <th>Input (Bytes)</th>
-        <th>Output (Bytes)</th>
+        <th>Input</th>
+        <th>Output</th>
         <th>Your IP-address</th>
         <th>Access point ID</th>
         <th>Access point group</th>
@@ -52,10 +53,16 @@
       {% for row in accounting %}
         <tr>
           <td>{{row.start_time|default_if_none:""}}</td>
-          <td>{{row.amount|default_if_none:""}}</td>
+          {% if row.amount > 0 %}
+            <td></td>
+            <td>{{row.amount|default_if_none:""}}</td>
+          {% else %}
+            <td>{{row.amount|default_if_none:""}}</td>
+            <td></td>
+          {% endif %}
           <td>{{row.duration|default_if_none:""}}</td>
-          <td>{{row.input_octets|default_if_none:""}}</td>
-          <td>{{row.output_octets|default_if_none:""}}</td>
+          <td>{{row.input_octets|filesizeformat|default_if_none:""}}</td>
+          <td>{{row.output_octets|filesizeformat|default_if_none:""}}</td>
           <td>{{row.framed_ip_address|default_if_none:""}}</td>
           <td>{{row.device.id|default_if_none:""}}</td>
           <td>{{row.device.group.name|default_if_none:""}}</td>
