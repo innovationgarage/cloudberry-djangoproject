@@ -237,12 +237,16 @@ class Pricing(models.Model):
                 existing.save()
             self.latest = True
         super(Pricing, self).save()
-    
+
+    _configuration_group = ["group"]
+
 class RadiusReply(AbstractRadiusReply):
     pass
 
 class Nas(AbstractNas):
-    pass
+    group = models.ForeignKey(django_admin_ownership.models.ConfigurationGroup,
+                              on_delete=models.CASCADE)
+    #_configuration_group = ["group"]
 
 class RadiusGroupCheck(AbstractRadiusGroupCheck):
     pass
