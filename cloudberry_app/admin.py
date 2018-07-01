@@ -91,7 +91,7 @@ class DeviceAdmin(import_export.admin.ImportExportMixin,
     list_select_related = ()
     readonly_fields = ('id_hex', 'key', 'get_config_list')
     fields = None
-    fieldsets = (
+    change_fieldsets = (
         (None, {
             'classes': ('model-info',),
             'fields': ['id_hex',
@@ -116,6 +116,28 @@ class DeviceAdmin(import_export.admin.ImportExportMixin,
         })
     )
 
+    add_fieldsets = (
+        (None, {
+            'fields': ['name',
+                       'group']
+        }),
+        (None, {
+            'fields': ['backend',
+                       'os_image']
+        })
+    )
+    
+    def add_view(self,request,extra_content=None):
+         self.fieldsets = self.add_fieldsets
+         return super(DeviceAdmin,self).add_view(request)
+     
+    def response_add(self, request, obj, post_url_continue=None):
+        return django.shortcuts.render(request, 'cloudberry_app/device_added.html', {'obj': obj, 'opts': obj._meta})
+    
+    def change_view(self,request,object_id,extra_content=None):
+         self.fieldsets = self.change_fieldsets
+         return super(DeviceAdmin,self).change_view(request,object_id)
+    
     # Override base class that 'hides' id_hex in add view, breaking fieldsets...
     def get_fields(self, request, obj=None):
         return self.fields
