@@ -119,12 +119,9 @@ class DeviceAdmin(import_export.admin.ImportExportMixin,
     add_fieldsets = (
         (None, {
             'fields': ['name',
-                       'group']
-        }),
-        (None, {
-            'fields': ['backend',
+                       'group',
                        'os_image']
-        })
+        }),
     )
     
     def add_view(self,request,extra_content=None):
