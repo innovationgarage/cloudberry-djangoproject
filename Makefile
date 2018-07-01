@@ -16,6 +16,9 @@ migrate:
 	python3 manage.py showmigrations
 	python3 manage.py migrate
 
+collectstatic:
+	python3 manage.py collectstatic --noinput
+
 createsuperuser:
 	python3 manage.py createsuperuser
 
