@@ -5,19 +5,21 @@
 {% block coltype %}colMS{% endblock %}
 {% block bodyclass %}{{ block.super }} dashboard{% endblock %}
 
-{% block title %}Django Registration Test App{% endblock %}
-{% block content %}
-  <h1>Welcome to Cloudberry</h1>
+{% block pretitle %}
   <div id="content-main">
     <div class="app-cloudberry_radius module">
       <table>
         <caption>
-          <a href="{% url 'cloudberry_radius:account_balance' %}" class="section" title="Quota & balance">Quota & balance</a>
+          <a href="javascript: void(0);" class="section">{% block title %}{% endblock %}</a>
         </caption>
         <tbody><tr class="account-balance">
-          <th scope="row"><a href="{% url 'cloudberry_radius:account_balance' %}">Account balance</a></th>
-          <td><a href="{% url 'cloudberry_radius:account_balance' %}?buy=10" class="addlink">Top up</a></td>
-          <td></td>
+          <td scope="row" style='width: 100%;'>
+{% endblock %}
+
+{% block content_title %}{% endblock %}
+
+{% block sidebar %}
+          </td><td></td>
         </tr></tbody>
       </table>
     </div>

@@ -18,8 +18,8 @@ class CustomRegistrationForm(registration.forms.RegistrationForm):
     is_staff = django.forms.ChoiceField(
          label=_("User type"),
          choices=[(False, 'Internet user (subscriber)'), (True, 'Hotspot owner')],
-         help_text = "Chose 'Internet user' to be able to surf the internet using one of" +
-         "our hotspot. Chose 'Hotspot owner' if you want to provide internet for" +
+         help_text = "Choose 'Internet user' to be able to surf the internet using one of " +
+         "our hotspots. Choose 'Hotspot owner' if you want to provide internet for" +
          "your customers or staff."
     )
     
