@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
             migrations.AddField(
                 model_name='configurationgroup',
                 name='owner',
-                field=models.ForeignKey(blank=True, null=True, on_delete='cascade', to=settings.AUTH_USER_MODEL),
+                field=models.ForeignKey(blank=True, null=True, on_delete=models.CASCADE, to=settings.AUTH_USER_MODEL),
             )
         ),
     ]

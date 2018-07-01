@@ -43,8 +43,8 @@ class ConfigurationGroup(models.Model):
     name = models.CharField(max_length=64,
                             unique=True,
                             db_index=True)
-    owner = models.ForeignKey('auth.User', blank=True, null=True, on_delete='cascade')
-    group = models.ForeignKey('ConfigurationGroup', blank=True, null=True, on_delete='cascade')
+    owner = models.ForeignKey('auth.User', blank=True, null=True, on_delete=models.CASCADE)
+    group = models.ForeignKey('ConfigurationGroup', blank=True, null=True, on_delete=models.CASCADE)
     read = models.ManyToManyField('auth.Group', related_name="read_devices", blank=True)
     write = models.ManyToManyField('auth.Group', related_name="write_devices", blank=True)
 

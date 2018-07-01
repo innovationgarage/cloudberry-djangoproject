@@ -151,14 +151,6 @@ USE_L10N = True
 
 USE_TZ = True
 
-# Django-registration settings
-ACCOUNT_ACTIVATION_DAYS = 7
-REGISTRATION_EMAIL_SUBJECT_PREFIX = '[Cloudberry App]'
-# SEND_ACTIVATION_EMAIL = True
-# ACTIVATION_EMAIL_SUBJECT = "Now you can taste the Cloudberry app by Innovation Garage"
-REGISTRATION_AUTO_LOGIN = True
-LOGIN_REDIRECT_URL = '/'
-
 #EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 # email verification

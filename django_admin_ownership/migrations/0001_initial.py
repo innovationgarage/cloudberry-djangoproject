@@ -20,7 +20,7 @@ class Migration(migrations.Migration):
                 fields=[
                     ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                     ('name', models.CharField(db_index=True, max_length=64, unique=True)),
-                    ('group', models.ForeignKey(blank=True, null=True, on_delete='cascade', to='auth.ConfigurationGroup')),
+                    ('group', models.ForeignKey(blank=True, null=True, on_delete=models.CASCADE, to='auth.ConfigurationGroup')),
                     ('read', models.ManyToManyField(blank=True, related_name='read_devices', to='auth.Group')),
                     ('write', models.ManyToManyField(blank=True, related_name='write_devices', to='auth.Group')),
                 ],
