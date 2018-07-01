@@ -79,5 +79,5 @@ def download_device_image(request, device):
     with open(image_path, 'rb') as f:
         resp = HttpResponse(f.read(), status=200, content_type='application/binary')
         resp['Content-Disposition'] = 'attachment; filename="%s.img"' % device.pk
-
+        resp['Set-Cookie'] = 'fileDownload=true; path=/'
         return resp
