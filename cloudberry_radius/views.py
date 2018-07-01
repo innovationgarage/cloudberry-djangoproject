@@ -17,6 +17,16 @@ import django_admin_ownership.models
 
 from .models import RadiusAccounting
 
+import paypalrestsdk
+client_id = "AcVFttUpFaVG7IWsnhWGdr44_H0m2IM7G-X5ONi0OF4pALNB-1Jv1b_250mCapimGcKc2mNkMoARBcDq"
+client_secret = "EHelJbyrsFaN8r9GH6COPYoercXs9RS36X5cV0WIzi7i1sUrG9zt1sge3Htz2032Tv58jfHPewCjlcPH"
+paypalrestsdk.configure({
+      'mode': 'sandbox', #sandbox or live
+      'client_id': client_id,
+      'client_secret': client_secret })
+
+from paypalrestsdk import Payout, ResourceNotFound
+
 def account_balance(request):
     return render(request,
                   'cloudberry_radius/account_balance.html',
@@ -34,12 +44,64 @@ def device_owner_account_balance(request):
             django.db.models.Q(device__group=group)
             | django.db.models.Q(withdrawal_group=group))
         res.append({'group': group,
-                    'balance': -accounting.aggregate(django.db.models.Sum('amount'))['amount__sum'],
+                    'balance': -(accounting.aggregate(django.db.models.Sum('amount'))['amount__sum'] or 0),
                     'accounting': accounting.order_by('-start_time')})
         
     return render(request,
                   'cloudberry_radius/device_owner_account_balance.html',
                   {'accountings': res})
+        
+def payout(request):
+    sender_batch_id = ''.join(
+        random.choice(string.ascii_uppercase) for i in range(12))
+
+    groups = django_admin_ownership.models.ConfigurationGroup.objects.filter(
+        django.db.models.Q(owner=request.user)
+        | django.db.models.Q(write__user=request.user))
+
+    res = []
+    for group in groups:
+        accounting = cloudberry_radius.models.RadiusAccounting.objects.filter(
+            django.db.models.Q(device__group=group)
+            | django.db.models.Q(withdrawal_group=group))
+        res.append({'group': group,
+                    'balance': -(accounting.aggregate(django.db.models.Sum('amount'))['amount__sum'] or 0)})
+
+    payout = Payout({
+        "sender_batch_header": {
+            "sender_batch_id": sender_batch_id,
+            "email_subject": "Your Cloudberry device payment"
+        },
+        "items": [
+            {
+                "recipient_type": "EMAIL",
+                "amount": {
+                    "value": res.balance,
+                    "currency": "USD"
+                },
+                "receiver": request.user.email,
+                "note": "Thank you.",
+                "sender_item_id": "item_1"
+            }
+        ]
+    })
+    
+    if payout.create(sync_mode=True):
+        res = []
+        for group in groups:
+            accounting = cloudberry_radius.models.RadiusAccounting.objects.filter(
+                django.db.models.Q(device__group=group)
+                | django.db.models.Q(withdrawal_group=group))
+            res.append({'group': group,
+                        'balance': 0,
+                        'accounting': accounting.order_by('-start_time'),
+                        'payout_id': payout.batch_header.payout_batch_id})
+        return render(request,
+                      'cloudberry_radius/device_owner_account_balance.html',
+                      {'accountings': res})
+    # else:
+    #     print(payout.error)
+    
 @require_GET
 def pdt(request, template="cloudberry_order/done.html", context=None):
     """Standard implementation of a view that processes PDT and then renders a template

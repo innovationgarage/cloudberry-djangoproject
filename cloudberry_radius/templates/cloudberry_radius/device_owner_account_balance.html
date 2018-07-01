@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load fullurl %}
 
 {% block title %}Django Registration Test App{% endblock %}
 
@@ -15,6 +16,11 @@
       <span style='font-size: 18pt;'>Current balance:</span>
       <span style='font-size: 18pt; {% if group.balance > 0 %}background: #eeffee; color: #00aa00;{% else %}background: #ffeeee; color: #aa0000;{% endif %}'>{{group.balance}}</span>
     </div>
+
+    <form action="{% url 'cloudberry_radius:payout' %}" method="post">
+      <input type="hidden" name="group_id" value="{{group.group.id}}" />
+      <button type="submit">Claim balance!</button> 
+    </form>
 
     {% if group.accounting %}
       <table>
