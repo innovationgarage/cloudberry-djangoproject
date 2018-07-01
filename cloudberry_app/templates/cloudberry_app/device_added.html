@@ -25,13 +25,22 @@
     document.getElementsByTagName('body')[0].appendChild(downloader_frame);
     document.getElementsByTagName('body')[0].appendChild(download_waiter);
     downloader = document.getElementById('downloader');
-    downloader.onload = function () {
-      if (downloader.contentDocument.body.innerHTML.indexOf('exception_value') == -1) {
-        window.location = '{% url 'admin:cloudberry_app_device_changelist' %}';
-      } else {
-        downloader.style.display='block';
-      }
-    };
+
     downloader.src = '{% url 'cloudberry_app:download_device_image' device=obj.pk %}';
+
+    function onload() {
+      var iframeDoc = downloader.contentDocument || iframe.contentWindow.document;
+
+      if (iframeDoc.readyState == 'complete') {
+        if (downloader.contentDocument.body.innerHTML.indexOf('exception_value') == -1) {
+          window.location = '{% url 'admin:cloudberry_app_device_changelist' %}';
+        } else {
+          downloader.style.display='block';
+        }
+        return;
+      }
+      window.setTimeout(onload, 100);
+    }
+    onload();
   </script>
 {% endblock %}
