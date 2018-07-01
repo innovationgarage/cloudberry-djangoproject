@@ -3,6 +3,14 @@
 
 {% block title %}Django Registration Test App{% endblock %}
 
+{% block breadcrumbs %}
+<div class="breadcrumbs">
+<a href="{% url 'admin:index' %}">{% trans 'Home' %}</a>
+&rsaquo; <a href="{% url 'admin:app_list' app_label='cloudberry_radius' %}">Network access</a>
+&rsaquo; Account balance
+</div>
+{% endblock %}
+
 {% block content %}
 
   <h1>Customer data usage & account balance</h1>
@@ -44,7 +52,7 @@
         {% endfor %}
       </table>
     {% else %}
-        <p>You have not used any data yet.</p>
+        <p>No one has started using yoru service yet.</p>
     {% endif %}
   {% endfor %}
 

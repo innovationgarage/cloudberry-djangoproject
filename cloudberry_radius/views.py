@@ -34,7 +34,7 @@ def device_owner_account_balance(request):
             django.db.models.Q(device__group=group)
             | django.db.models.Q(withdrawal_group=group))
         res.append({'group': group,
-                    'balance': -accounting.aggregate(django.db.models.Sum('amount'))['amount__sum'],
+                    'balance': -(accounting.aggregate(django.db.models.Sum('amount'))['amount__sum'] or 0),
                     'accounting': accounting.order_by('-start_time')})
         
     return render(request,
