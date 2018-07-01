@@ -21,7 +21,7 @@
 
     <div style="margin-bottom: 20pt;">
       <span style='font-size: 18pt;'>Current balance:</span>
-      <span style='font-size: 18pt; {% if group.balance > 0 %}background: #eeffee; color: #00aa00;{% else %}background: #ffeeee; color: #aa0000;{% endif %}'>{{group.balance}}</span>
+      <span style='font-size: 18pt; {% if group.balance > 0 %}background: #eeffee; color: #00aa00;{% else %}background: #ffeeee; color: #aa0000;{% endif %}'>{{group.balance|default_if_none:"0.0"}}</span>
     </div>
 
     {% if group.accounting %}
