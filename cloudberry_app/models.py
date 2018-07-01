@@ -168,14 +168,15 @@ class Device(django_admin_ownership.models.GroupedConfigurationMixin, AbstractDe
 
     backend = models.CharField(_('backend'),
                                choices=[("/cloudberry_app/schema/backend/%s" % item[0], item[1]) for item in app_settings.BACKENDS],
-                               blank=True,
+                               default="/cloudberry_app/schema/backend/%s" % app_settings.BACKENDS[0][0],
+                               blank=False,
                                max_length=128,
                                help_text=_('Select <a href="http://netjsonconfig.openwisp.org/en/'
                                            'stable/" target="_blank">netjsonconfig</a> backend'))
 
     os_image = cloudberry_app.fields.DynamicTextListField(
         _('os image'),
-        blank=True,
+        blank=False,
         max_length=128,
         help_text=_('Select OS image'))
     def _get_os_images():

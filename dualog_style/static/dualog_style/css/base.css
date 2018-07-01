@@ -12,7 +12,7 @@ super-light: #f2f9f8
 */
 }
 #site-name a {
-    background: none; // url(../../../static/ui/openwisp/images/openwisp-logo.svg) no-repeat scroll 0 50% / 100%;
+    background: url(../images/logo.svg) no-repeat scroll 0 50% / 40%;
 }
 
 #header {

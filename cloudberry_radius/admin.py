@@ -31,6 +31,24 @@ class RadiusReplyAdmin(AbstractRadiusReplyAdmin):
     pass
 
 
+class AccountBalance(object):
+    class _meta(object):
+        swapped = False
+        app_config = None
+        abstract = False
+        model_name = 'account_balance'
+        app_label = 'cloudberry_radius'
+        verbose_name_plural = 'Account balance'
+        verbose_name = 'Account balance'
+        object_name = 'account_balance'
+        
+@admin.register(AccountBalance)
+class AccountBalanceAdmin(admin.ModelAdmin):
+    def has_module_permission(self, request):
+        return True
+    def get_model_perms(self, request):
+        return {"change": True}
+
 @admin.register(RadiusAccounting)
 class RadiusAccountingAdmin(admin.ModelAdmin):
     list_display = ('user', 'start_time', 'amount', 'duration', 'input_octets', 'output_octets', 'framed_ip_address', 'device_id', 'device_group_name')

@@ -20,15 +20,12 @@ from django.contrib.auth import views as auth_views
 from django.views.generic import TemplateView
 
 urlpatterns = [
-    url(r'^$', TemplateView.as_view(template_name='cloudberry_accounts/index.html'), name='index'),
-    url(r'^accounts/', include('registration.backends.default.urls')),
-    url(r'^accounts/profile/', TemplateView.as_view(template_name='cloudberry_accounts/profile.html'), name='profile'),
-    url(r'^login/', auth_views.login, name='login'),
-    url(r'^admin/', admin.site.urls, name='admin'),
+    url(r'^', include('cloudberry_accounts.urls')),
     url(r'^', include('cloudberry_app.controller.urls', namespace='controller')),
     url(r'^', include('cloudberry_app.urls', namespace='netjsonconfig')),
     url(r'^', include('django_x509.urls', namespace='x509')),
     url(r'^', include('cloudberry_radius.urls', namespace='freeradius')),    
+    url(r'^admin/', admin.site.urls, name='admin'),
 ]
 
 # extendnetjson: django_netjsonconfig requires staticfiles to

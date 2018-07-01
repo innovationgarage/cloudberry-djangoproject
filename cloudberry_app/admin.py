@@ -102,12 +102,14 @@ class DeviceAdmin(import_export.admin.ImportExportMixin,
         }),
         (None, {
             'fields': ['name',
-                       'group',
-                       'backend']
+                       'group']
         }),
         (None, {
-            'fields': ['os_image',
-                       ('mac_address',
+            'fields': ['backend',
+                       'os_image']
+        }),
+        (None, {
+            'fields': [('mac_address',
                         'os'),
                        ('model',
                         'system')]
