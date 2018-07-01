@@ -57,11 +57,23 @@ class RadiusAccountingAdmin(admin.ModelAdmin):
     list_filter = ('start_time', 'stop_time')    
 
 @admin.register(Pricing)
-class AuthorAdmin(admin.ModelAdmin):
-    readonly_fields=('latest',)
+class PricingAdmin(admin.ModelAdmin):
+    readonly_fields=('latest','timestamp')
     list_display = ('latest', 'timestamp', 'group', 'cost_per_byte')
     list_display_links = list_display
-
+    
+    add_fieldsets = ((None, {"fields": ["group", "cost_per_byte"]}),)
+    change_fieldsets = ((None, {"fields": ["timestamp", "latest"]}),
+                        (None, {"fields": ["group", "cost_per_byte"]}),)
+    
+    def add_view(self,request,extra_content=None):
+         self.fieldsets = self.add_fieldsets
+         return super(PricingAdmin,self).add_view(request)
+    
+    def change_view(self,request,object_id,extra_content=None):
+         self.fieldsets = self.change_fieldsets
+         return super(PricingAdmin,self).change_view(request,object_id)
+    
 @admin.register(Nas)
 class NasAdmin(AbstractNasAdmin):
     pass
