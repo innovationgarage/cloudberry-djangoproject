@@ -226,9 +226,7 @@ class Pricing(models.Model):
                               on_delete=models.CASCADE,
                               related_name='radius_pricing')
     cost_per_byte = models.FloatField(verbose_name=_('Cost per byte'),
-                                      db_column='cost',
-                                      null=True,
-                                      blank=True)
+                                      db_column='cost')
 
     def save(self):
         if self.latest is None:
