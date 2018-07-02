@@ -13,7 +13,48 @@
 {% block submit_buttons_bottom %}{% submit_row %}{% endblock %}
 
 {% block content %}
-{{ block.super }}
+  <style>
+    #content-main {
+      width: 65%;
+    }
+  </style>
+  {{ block.super }}
+<div id="content-related" style="float: right; width: 30%; margin-right: 0;">
+  <div class="module">
+    <h2>Where to buy devices</h2>
+
+    <p>To use this service you need to buy a physical device and install
+      one of our images on it. You can select any of the devices and
+      stores below:</p>
+
+    <ul>
+      <li><a href="https://alexnld.com/product/orange-pi-r1-h2-quad-core-cortex-a7-open-source-256mb-ddr3-development-board-mini-pc/?gclid=CjwKCAjwmufZBRBJEiwAPJ3LpgU7OvxLsmuQzTHJFoHc7Mxl0vpqBgjWZwKr-VRVvT-se9DXLwg40BoCTLQQAvD_BwE">OrangePI R1 (Two ethernet port version)</a></li>
+    </ul>
+
+    <h2>How to write the image</h2>
+    <p>In the next step you'll get to download a device image. Once
+    downloaded, you'll have to write this image to an SD card and then
+    put the card in your device. The following is a short guide to how
+      to do this:</p>
+
+    <h3>On Microsoft Windows</h3>
+    <p>Download <a href="https://etcher.io/">Etcher</a> and use it to write the image file.</p>
+
+    <h3>On Linux</h3>
+    <p>Find out which device file (/dev/sdX) corresponds to your
+    sd-card reader by removing and inserting the card to see which
+    device file appears/dissapears. Then run the commands (replace X in
+    /dev/sdX with the letter you found out):<p>
+
+      <pre>
+        dd if=downloadedimage.img of=/dev/sdX
+        sync
+      </pre>
+      
+  </div>
+</div>
+
+
 <div class="djnjc-overlay">
     <div class="inner"></div>
 </div>
