@@ -1,16 +1,7 @@
-body {
+* {
     font-family: 'Poppins', sans-serif;
-/*
-    Blue:
-    dark: #02405a
-    light: #3c667a
-    super-light: #ced9de
-
-    Green:
-    Dark: #51c1b7
-super-light: #f2f9f8
-*/
 }
+
 #site-name a {
     background: url(../images/logo.svg) no-repeat scroll 0 50% / 40%;
 }
